@@ -1,0 +1,16 @@
+[
+{
+  "modid": "overlay",
+  "name": "flamey's overlay mod",
+  "description": "Flamey's overlay mod for pika and jartex",
+  "version": "0.0.1",
+  "mcversion": "1.8.9",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["flamey"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
