@@ -61,7 +61,7 @@ object Overlay {
         )
 
         mc.fontRendererObj.drawStringWithShadow(
-            if (profile.nicked) "-" else  getFKDRColor(fkdr) + fkdr.toString(),
+            if (profile.nicked) getFKDRColor(-0.0) + "-" else  getFKDRColor(fkdr) + fkdr.toString(),
             (x + width) - 35f / 2 - mc.fontRendererObj.getStringWidth(if (profile.nicked) "-" else getFKDRColor(fkdr) + fkdr.toString()) / 2,
             y + 7f,
             -1
@@ -76,12 +76,8 @@ object Overlay {
 
         val joinPattern = Regex("BedWars ❖ (\\w+) has joined the game! \\(\\d+/\\d+\\)")
         val leavePattern = Regex("BedWars ❖ (\\w+) has left the game! \\(\\d+/\\d+\\)")
-        val teamPattern = Regex("BedWars ❖ You are now in team (\\w+).")
 
         when {
-            teamPattern.matches(unformattedmsg) -> {
-                mode = Bedwars.NONE
-            }
             joinPattern.matches(unformattedmsg) -> {
                 val username = joinPattern.find(unformattedmsg)?.groupValues?.get(1).toString()
                 println("JOINED $username")
@@ -175,7 +171,7 @@ object Overlay {
             in 55..60 -> "§3"
             in 65..75 -> "§l§e"
             in 75..100 -> "§l§6"
-            else -> "§a"
+            else -> "§k"
         }
     }
 

@@ -1,7 +1,19 @@
-# Overlay
-Flamey's overlay Mod for Pika network & Jartex network
+<div align="center">
+<h1>Bedwars Overlay Mod</h1>
+<h3> Flamey's bedwars overlay for Jartex network </h3>
+</div>
 
-## use `/overlay` for settings.
-configs are saved in .minecraft/config/overlay.w
+## Settings
 
-this is my first kotlin project so dont take the code seriously
+use the `/overlay` command for the GUI \
+bind the overlay using the command `/overlay` \
+use `/overlay reset` to reset the overlay 
+
+## Supported Servers
+
+Jartex Network \
+Pika Network *[SOON]* \
+BlocksMC *[SOON]* 
+
+## Configurations
+all the config files are saved in `.minecraft/config/overlay.bruh`
