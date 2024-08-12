@@ -10,15 +10,24 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.CopyOnWriteArrayList
 
 
 object API {
+
+    val fetchedProfiles = CopyOnWriteArrayList<Profile>()
 
     init {
         HttpURLConnection.setFollowRedirects(true)
     }
 
     fun getProfile(username: String, bedwars: Bedwars = Bedwars.NONE) : Profile {
+        fetchedProfiles.find { it.username == username }?.let {
+            return it
+        }
+
+        println("requesting for $username")
+
         val url = URL("${getURL()}/profile/$username")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
@@ -26,12 +35,14 @@ object API {
         connection.connect()
 
         if (connection.responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
-            return Profile(
+            val profile = Profile(
                 username,
-                rank = Rank(0, 0, 0, "-"),
+                rank = Rank(0, 0, 0, ""),
                 nicked = true,
                 fkdr = 0.0
             )
+            fetchedProfiles.add(profile)
+            return profile
         }
 
         var result: String
@@ -42,7 +53,7 @@ object API {
 
         val json = JSONObject(result)
         val rank = json.getJSONObject("rank")
-        return Profile(
+        val profile = Profile(
             username,
             rank = Rank(
                 rank.getInt("level"),
@@ -53,11 +64,20 @@ object API {
             nicked = false,
             fkdr = getFKDR(username, bedwars)
         )
+        fetchedProfiles.add(profile)
+        return profile
 
     }
 
     fun getFKDR(username: String, mode: Bedwars) : Double {
         if (mode == Bedwars.NONE) return 0.0
+
+        fetchedProfiles.find { it.username == username }?.let {
+            return it.fkdr
+        }
+
+        println("requesting for $username")
+
         val url = URL("${getURL()}/profile/$username/leaderboard?type=bedwars&interval=total&mode=$mode")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"

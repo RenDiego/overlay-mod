@@ -38,7 +38,7 @@ object Overlay {
         )
         offset = height
 
-        for (profile in profiles) {
+        profiles.forEach { profile ->
             drawRow(y + offset, profile)
             offset += height
         }
@@ -64,7 +64,7 @@ object Overlay {
         )
 
         mc.fontRendererObj.drawStringWithShadow(
-            if (profile.nicked) getFKDRColor(-0.0) + "-" else  getFKDRColor(fkdr) + fkdr.toString(),
+            if (profile.nicked) "§7§k" + "-" else getFKDRColor(fkdr) + fkdr.toString(),
             (x + width) - 35f / 2 - mc.fontRendererObj.getStringWidth(if (profile.nicked) "-" else getFKDRColor(fkdr) + fkdr.toString()) / 2,
             y + 7f,
             -1
@@ -83,27 +83,24 @@ object Overlay {
         when {
             joinPattern.matches(unformattedmsg) -> {
                 val username = joinPattern.find(unformattedmsg)?.groupValues?.get(1).toString()
-                println("JOINED $username")
                 join(username)
             }
             leavePattern.matches(unformattedmsg) -> {
                 val username = leavePattern.find(unformattedmsg)?.groupValues?.get(1).toString()
-                println(username)
                 leave(username)
             }
             msg.equals("§r                 §r§f§m---§r §r§6§lThe game has started! §r§f§m---§r") -> {
-                println("Bruh")
+                println("START")
                 thread(start = true) {
-                    Thread.sleep(1000)
-                    val players = mc.thePlayer.sendQueue.playerInfoMap
-                    val newProfiles = profiles.zip(players) { profile, player ->
-                        profile.displayName = ScorePlayerTeam.formatPlayerName(player.playerTeam, player.gameProfile.name)
-                        profile
+                    Thread.sleep(1500)
+                    val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
+                    players.forEach { p ->
+                        profiles.find { it.username == p.gameProfile.name }?.let { profile ->
+                            println("player found ${profile.username}")
+                            profile.displayName = ScorePlayerTeam.formatPlayerName(p.playerTeam, p.gameProfile.name)
+                        }
                     }
-                    reset()
-                    profiles.addAll(newProfiles)
-                    profiles.sortedBy { it.displayName }.reversed()
-                    println("sorted")
+                    profiles.sortByDescending { it.displayName }
                 }
             }
         }
@@ -137,10 +134,13 @@ object Overlay {
     }
 
     private fun leave(username: String) {
+        println("player $username has left")
         profiles.removeIf { it.username == username }
     }
 
     private fun join(username: String) {
+        println("player $username has joined")
+        profiles.sortBy { it.username }
         if (!(profiles.any { it.username == username }) && username != mc.thePlayer.name) {
             thread(start = true) {
                 val profile = API.getProfile(username, mode)
@@ -152,11 +152,10 @@ object Overlay {
     private fun fetch() {
         val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
         for (player in players) {
-            if (!profiles.any { it.username == player.gameProfile.name }) {
-                val profile = API.getProfile(player.gameProfile.name, mode)
-                profiles.add(profile)
-            }
+            val profile = API.getProfile(player.gameProfile.name, mode)
+            profiles.addIfAbsent(profile)
         }
+        profiles.sortByDescending { it.fkdr }
     }
 
     fun reset() {
@@ -168,7 +167,7 @@ object Overlay {
     private fun getFKDRColor(fkdr: Double) : String {
         return when (fkdr) {
             in 0.0..1.0 -> "§2"
-            in 1.0..3.0 -> "§a"
+            in 1.0..5.0 -> "§a"
             else -> "§4"
         }
     }

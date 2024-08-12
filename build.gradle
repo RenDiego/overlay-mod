@@ -1,7 +1,7 @@
 plugins {
     id "java"
     id "idea"
-    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.jvm" version '2.0.0'
     id "com.github.johnrengelman.shadow" version "6.1.0"
     id "net.minecraftforge.gradle.forge"
 }
@@ -44,11 +44,13 @@ configurations {
 
 dependencies {
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    include  "org.jetbrains.kotlin:kotlin-stdlib:2.0.0"
 
-    runtimeOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    runtimeOnly "org.jetbrains.kotlin:kotlin-stdlib:2.0.0"
 
     include 'org.json:json:20231013'
+
+    runtimeOnly 'org.json:json:20231013'
 
     include fileTree(include: ["*.jar"], dir: "libs")
 }
