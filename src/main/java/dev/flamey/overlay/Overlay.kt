@@ -18,6 +18,7 @@ object Overlay {
     var x = 10; var y = 10; var width = 200; var height = 20
     private val profiles = CopyOnWriteArrayList<Profile>()
     private val mc = Minecraft.getMinecraft()
+    var offset = 0
     private var mode = Bedwars.NONE
 
     fun draw() {
@@ -35,8 +36,7 @@ object Overlay {
             y + 7f,
             -1
         )
-
-        var offset = height
+        offset = height
 
         for (profile in profiles) {
             drawRow(y + offset, profile)
@@ -102,7 +102,8 @@ object Overlay {
                     }
                     reset()
                     profiles.addAll(newProfiles)
-                    profiles.sortedByDescending { it.displayName }
+                    profiles.sortedBy { it.displayName }.reversed()
+                    println("sorted")
                 }
             }
         }

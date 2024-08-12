@@ -74,7 +74,7 @@ class CommandGUI : GuiScreen() {
             keybindButton.isMouseOver -> {
                 listening = true
             }
-            Utils.isMouseOver(p_mouseClicked_1_, p_mouseClicked_2_, Overlay.x, Overlay.y, Overlay.width, Overlay.height) -> {
+            Utils.isMouseOver(p_mouseClicked_1_, p_mouseClicked_2_, Overlay.x, Overlay.y, Overlay.width, Overlay.offset) -> {
                 dragging = true
                 x2 = p_mouseClicked_1_ - Overlay.x
                 y2 = p_mouseClicked_2_ - Overlay.y
