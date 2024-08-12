@@ -17,8 +17,8 @@ class CommandClass : CommandBase() {
 
     override fun processCommand(p0: ICommandSender?, p1: Array<out String>?) {
         Main.toggledGUI = !Main.toggledGUI
-        if (p1?.isNotEmpty() == true && p1[0] == "reset") {
-            Overlay.reset()
+        if (p1?.isNotEmpty() == true && p1[0] == "reload") {
+            Overlay.reload()
         }
     }
 

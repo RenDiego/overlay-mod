@@ -159,9 +159,15 @@ object Overlay {
     }
 
     fun reset() {
-        println("RESET")
         mode = Bedwars.NONE
         profiles.clear()
+    }
+
+    fun reload() {
+        reset()
+        thread(start = true) {
+            fetch()
+        }
     }
 
     private fun getFKDRColor(fkdr: Double) : String {
