@@ -48,9 +48,7 @@ dependencies {
 
     runtimeOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    implementation 'org.json:json:20231013'
-
-    runtimeOnly 'org.json:json:20231013'
+    include 'org.json:json:20231013'
 
     include fileTree(include: ["*.jar"], dir: "libs")
 }
