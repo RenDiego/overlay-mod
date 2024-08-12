@@ -1,12 +1,11 @@
 package dev.flamey.overlay.config
 
-import dev.flamey.overlay.Main
 import dev.flamey.overlay.Main.toggled
 import dev.flamey.overlay.Overlay
 import dev.flamey.overlay.Overlay.x
 import dev.flamey.overlay.Overlay.y
-import dev.flamey.overlay.command.CommandGUI
-import dev.flamey.overlay.command.CommandGUI.Companion.keybind
+import dev.flamey.overlay.command.gui.CommandGUI
+import dev.flamey.overlay.command.gui.CommandGUI.Companion.keybind
 import net.minecraft.client.Minecraft
 import java.io.*
 

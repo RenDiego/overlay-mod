@@ -22,6 +22,8 @@ group = project.maven_group
 sourceCompatibility = targetCompatibility = 1.8
 compileJava.options.encoding = "UTF-8"
 
+configurations.runtimeOnly.canBeResolved = true
+
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
@@ -42,19 +44,11 @@ configurations {
 
 dependencies {
 
-    implementation 'io.ktor:ktor-client-cio-jvm:2.3.12'
-    include "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    include("com.github.CCBlueX:Elixir:1.2.6") {
-        exclude module: "kotlin-stdlib"
-        exclude module: "authlib"
-    }
-
-    include "org.apache.httpcomponents:httpmime:4.5.14"
+    runtimeOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     include 'org.json:json:20231013'
-
-    include "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
 
     include fileTree(include: ["*.jar"], dir: "libs")
 }

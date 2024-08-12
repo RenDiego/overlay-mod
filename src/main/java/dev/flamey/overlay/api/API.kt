@@ -5,14 +5,11 @@ import dev.flamey.overlay.api.player.Profile
 import dev.flamey.overlay.api.player.Rank
 import dev.flamey.overlay.api.server.Bedwars
 import dev.flamey.overlay.api.server.SupportedServer
-import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import kotlin.math.round
 
 
 object API {
@@ -81,11 +78,13 @@ object API {
         val finals = json.optJSONObject("Final kills")?.optJSONArray("entries")?.getJSONObject(0)?.getInt("value")
         val deaths = json.optJSONObject("Losses")?.optJSONArray("entries")?.getJSONObject(0)?.getInt("value")
 
-        if (finals != null && deaths != null) {
-            return (finals.toDouble() / deaths.toDouble())
-        } else {
-            return 0.0
-        }
+        return if (finals != null) {
+            if (deaths != null) {
+                finals.toDouble() / deaths.toDouble()
+            } else {
+                finals.toDouble()
+            }
+        } else 0.0
     }
 
     private fun getURL() : String {

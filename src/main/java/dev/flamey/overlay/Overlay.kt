@@ -4,10 +4,6 @@ import dev.flamey.overlay.api.API
 import dev.flamey.overlay.api.player.Profile
 import dev.flamey.overlay.api.server.Bedwars
 import dev.flamey.overlay.utils.Utils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import java.awt.Color
@@ -53,12 +49,6 @@ object Overlay {
         val level = profile.rank.level
         val fkdr = BigDecimal(profile.fkdr).setScale(1, RoundingMode.HALF_UP).toDouble()
 
-        val fkdrDisplay = if (fkdr == 0.0) {
-            "0"
-        } else {
-            getFKDRColor(fkdr) + fkdr.toString()
-        }
-
         mc.fontRendererObj.drawStringWithShadow(
             if (profile.nicked) {
                 "§e[NICK]§r ${profile.username}"
@@ -71,8 +61,8 @@ object Overlay {
         )
 
         mc.fontRendererObj.drawStringWithShadow(
-            if (profile.nicked) "-" else  fkdrDisplay ,
-            (x + width) - 35f / 2 - mc.fontRendererObj.getStringWidth(if (profile.nicked) "-" else fkdrDisplay) / 2,
+            if (profile.nicked) "-" else  getFKDRColor(fkdr) + fkdr.toString(),
+            (x + width) - 35f / 2 - mc.fontRendererObj.getStringWidth(if (profile.nicked) "-" else getFKDRColor(fkdr) + fkdr.toString()) / 2,
             y + 7f,
             -1
         )

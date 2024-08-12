@@ -1,19 +1,18 @@
-package dev.flamey.overlay.command
+package dev.flamey.overlay.command.gui
 
 import dev.flamey.overlay.Main
 import dev.flamey.overlay.Overlay
 import dev.flamey.overlay.utils.Utils
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.ScaledResolution
 import org.lwjgl.input.Keyboard
+import org.lwjgl.opengl.GL11
 
 class CommandGUI : GuiScreen() {
 
     val overlay = Overlay
     private lateinit var keybindButton: GuiButton
     private lateinit var searchButton: GuiButton
-    private lateinit var sr: ScaledResolution
     private var listening = false; var dragging = false
     var x2 = 10; var y2 = 10
 
@@ -23,19 +22,18 @@ class CommandGUI : GuiScreen() {
     }
 
     override fun initGui() {
-        sr = ScaledResolution(mc)
         keybindButton = GuiButton(
             1,
-            ((sr.scaledWidth - 100) / 2),
-            ((sr.scaledHeight - 20) / 2),
+            ((this.width - 100) / 2),
+            ((this.height - 20) / 2),
             100,
             20,
             "Keybind: ${Keyboard.getKeyName(keybind)}"
         )
         searchButton = GuiButton(
             2,
-            sr.scaledWidth - 210,
-            sr.scaledHeight - 30,
+            this.width - 210,
+            this.height - 30,
             200,
             20,
             "Search for a player"
@@ -47,16 +45,18 @@ class CommandGUI : GuiScreen() {
 
         overlay.draw()
 
-        fontRendererObj.drawStringWithShadow("Flamey's Overlay",
-            ((sr.scaledWidth - fontRendererObj.getStringWidth("Flamey's Overlay")) / 2).toFloat(),
-            ((sr.scaledHeight - fontRendererObj.FONT_HEIGHT) / 2).toFloat() - 35,
-            -1
-        )
+        GL11.glPushMatrix()
+
+        GL11.glScaled(2.0, 2.0, 2.0)
+
+        this.drawCenteredString(this.fontRendererObj, "bedwars overlay mod", (this.width / 2) / 2, ((this.height - fontRendererObj.FONT_HEIGHT) / 2) / 2 - 20, -1)
+
+        GL11.glPopMatrix()
 
         fontRendererObj.drawStringWithShadow(
             "You can drag & move the overlay",
-            ((sr.scaledWidth - fontRendererObj.getStringWidth("You can drag & move the overlay")) / 2).toFloat(),
-            ((sr.scaledHeight - fontRendererObj.FONT_HEIGHT) / 2).toFloat() - 20,
+            ((this.width - fontRendererObj.getStringWidth("You can drag & move the overlay")) / 2).toFloat(),
+            ((this.height - fontRendererObj.FONT_HEIGHT) / 2).toFloat() - 20,
             -1
         )
 
@@ -108,7 +108,6 @@ class CommandGUI : GuiScreen() {
     }
 
     override fun updateScreen() {
-        sr = ScaledResolution(mc)
         keybindButton.displayString = if (listening) "Keybind: ..." else "Keybind: ${Keyboard.getKeyName(keybind)}"
     }
 

@@ -1,16 +1,14 @@
 package dev.flamey.overlay;
 
-import dev.flamey.overlay.api.server.Bedwars;
 import dev.flamey.overlay.api.server.SupportedServer;
 import dev.flamey.overlay.command.CommandClass;
-import dev.flamey.overlay.command.CommandGUI;
+import dev.flamey.overlay.command.gui.CommandGUI;
 import dev.flamey.overlay.config.ConfigManager;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -19,10 +17,14 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.lwjgl.input.Keyboard;
 
-@Mod(modid = "overlay", version = "0.0.1", name = "overlay")
+@Mod(modid = Main.NAME, version = Main.VERSION, name = Main.MODID)
 public class Main {
 
     public Minecraft mc = Minecraft.getMinecraft();
+
+    public final static String VERSION = "0.0.1";
+    public final static String NAME = "overlay";
+    public final static String MODID = "overlay";
 
     public static ConfigManager configManager = new ConfigManager();
     public static boolean toggledGUI = false;
@@ -30,7 +32,7 @@ public class Main {
     public static SupportedServer server;
 
     @Mod.EventHandler
-    public void init(FMLInitializationEvent e) throws InstantiationException, IllegalAccessException {
+    public void init(FMLInitializationEvent e) {
         MinecraftForge.EVENT_BUS.register(this);
         ClientCommandHandler.instance.registerCommand(new CommandClass());
         configManager.load();
