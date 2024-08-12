@@ -164,7 +164,7 @@ object Overlay {
     }
 
     fun reload() {
-        reset()
+        profiles.clear()
         thread(start = true) {
             fetch()
         }

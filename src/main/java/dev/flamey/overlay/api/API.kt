@@ -21,14 +21,14 @@ object API {
         HttpURLConnection.setFollowRedirects(true)
     }
 
-    fun getProfile(username: String, bedwars: Bedwars = Bedwars.NONE) : Profile {
+    fun getProfile(username: String, bedwars: Bedwars = Bedwars.NONE, server: SupportedServer = Main.server) : Profile {
         fetchedProfiles.find { it.username == username }?.let {
             return it
         }
 
         println("requesting for $username")
 
-        val url = URL("${getURL()}/profile/$username")
+        val url = URL("${getURL(server)}/profile/$username")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0")
@@ -69,7 +69,7 @@ object API {
 
     }
 
-    fun getFKDR(username: String, mode: Bedwars) : Double {
+    fun getFKDR(username: String, mode: Bedwars, server: SupportedServer = Main.server) : Double {
         if (mode == Bedwars.NONE) return 0.0
 
         fetchedProfiles.find { it.username == username }?.let {
@@ -78,7 +78,7 @@ object API {
 
         println("requesting for $username")
 
-        val url = URL("${getURL()}/profile/$username/leaderboard?type=bedwars&interval=total&mode=$mode")
+        val url = URL("${getURL(server)}/profile/$username/leaderboard?type=bedwars&interval=total&mode=$mode")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0")
@@ -94,7 +94,7 @@ object API {
             InputStreamReader(connection.inputStream)
         ).use { reader -> result = reader.readLine() }
 
-        var json = JSONObject(result)
+        val json = JSONObject(result)
         val finals = json.optJSONObject("Final kills")?.optJSONArray("entries")?.getJSONObject(0)?.getInt("value")
         val deaths = json.optJSONObject("Losses")?.optJSONArray("entries")?.getJSONObject(0)?.getInt("value")
 
@@ -107,12 +107,11 @@ object API {
         } else 0.0
     }
 
-    private fun getURL() : String {
-        return when (Main.server) {
+    fun getURL(server: SupportedServer) : String {
+        return when (server) {
             SupportedServer.JARTEX -> "https://stats.jartexnetwork.com/api"
             SupportedServer.PIKA -> "https://stats.pika-network.net/api"
             SupportedServer.NONE -> ""
-            else -> ""
         }
     }
 

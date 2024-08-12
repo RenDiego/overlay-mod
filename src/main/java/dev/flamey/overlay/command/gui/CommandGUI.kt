@@ -25,18 +25,18 @@ class CommandGUI : GuiScreen() {
         keybindButton = GuiButton(
             1,
             ((this.width - 100) / 2),
-            ((this.height - 20) / 2),
+            ((this.height) / 2),
             100,
             20,
             "Keybind: ${Keyboard.getKeyName(keybind)}"
         )
         searchButton = GuiButton(
             2,
-            this.width - 210,
+            this.width - 110,
             this.height - 30,
-            200,
+            100,
             20,
-            "Search for a player"
+            "Search"
         )
     }
 
@@ -56,7 +56,7 @@ class CommandGUI : GuiScreen() {
         fontRendererObj.drawStringWithShadow(
             "You can drag & move the overlay",
             ((this.width - fontRendererObj.getStringWidth("You can drag & move the overlay")) / 2).toFloat(),
-            ((this.height - fontRendererObj.FONT_HEIGHT) / 2).toFloat() - 18,
+            ((this.height - fontRendererObj.FONT_HEIGHT) / 2).toFloat() - 13,
             -1
         )
 
@@ -79,8 +79,8 @@ class CommandGUI : GuiScreen() {
                 x2 = p_mouseClicked_1_ - Overlay.x
                 y2 = p_mouseClicked_2_ - Overlay.y
             }
-            searchButton.isMouseOver && p_mouseClicked_3_ == 1 -> {
-                
+            searchButton.isMouseOver -> {
+                mc.displayGuiScreen(SearchGUI())
             }
         }
         super.mouseClicked(p_mouseClicked_1_, p_mouseClicked_2_, p_mouseClicked_3_)
