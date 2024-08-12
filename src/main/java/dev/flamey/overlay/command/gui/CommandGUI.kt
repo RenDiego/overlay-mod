@@ -56,7 +56,7 @@ class CommandGUI : GuiScreen() {
         fontRendererObj.drawStringWithShadow(
             "You can drag & move the overlay",
             ((this.width - fontRendererObj.getStringWidth("You can drag & move the overlay")) / 2).toFloat(),
-            ((this.height - fontRendererObj.FONT_HEIGHT) / 2).toFloat() - 20,
+            ((this.height - fontRendererObj.FONT_HEIGHT) / 2).toFloat() - 18,
             -1
         )
 

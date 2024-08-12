@@ -5,10 +5,11 @@ import dev.flamey.overlay.api.player.Profile
 import dev.flamey.overlay.api.server.Bedwars
 import dev.flamey.overlay.utils.Utils
 import net.minecraft.client.Minecraft
+import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import java.awt.Color
-import java.math.RoundingMode
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.concurrent.thread
 
@@ -49,11 +50,13 @@ object Overlay {
         val level = profile.rank.level
         val fkdr = BigDecimal(profile.fkdr).setScale(1, RoundingMode.HALF_UP).toDouble()
 
+        val rankDisplay = profile.rank.rankDisplay.replace("&", "§")
+
         mc.fontRendererObj.drawStringWithShadow(
             if (profile.nicked) {
-                "§e[NICK]§r ${profile.username}"
+                "§e[NICK]§r ${rankDisplay + profile.displayName}"
             } else {
-                "§8[${getLevelColor(level) + level}§8]§r ${profile.username}"
+                "§8[${getLevelColor(level) + level}§8]§r ${rankDisplay + profile.displayName}"
             },
             x + 7f,
             y + 7f,
@@ -88,12 +91,27 @@ object Overlay {
                 println(username)
                 leave(username)
             }
+            msg.equals("§r                 §r§f§m---§r §r§6§lThe game has started! §r§f§m---§r") -> {
+                println("Bruh")
+                thread(start = true) {
+                    Thread.sleep(1000)
+                    val players = mc.thePlayer.sendQueue.playerInfoMap
+                    val newProfiles = profiles.zip(players) { profile, player ->
+                        profile.displayName = ScorePlayerTeam.formatPlayerName(player.playerTeam, player.gameProfile.name)
+                        profile
+                    }
+                    reset()
+                    profiles.addAll(newProfiles)
+                    profiles.sortedByDescending { it.displayName }
+                }
+            }
         }
 
         when {
             msg.contains("§r§6§nBW1-") -> {
                 reset()
-                mode = Bedwars.SOLO
+                mode =
+                    Bedwars.SOLO
             }
 
             msg.contains("§r§6§nBW2-") -> {
@@ -131,18 +149,17 @@ object Overlay {
     }
 
     private fun fetch() {
-        val players = CopyOnWriteArrayList(mc.theWorld.playerEntities)
-        val fetchedProfiles = ArrayList<Profile>()
+        val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
         for (player in players) {
-            if (!profiles.any { it.username == player.name }) {
-                val profile = API.getProfile(player.name, mode)
-                fetchedProfiles.add(profile)
+            if (!profiles.any { it.username == player.gameProfile.name }) {
+                val profile = API.getProfile(player.gameProfile.name, mode)
+                profiles.add(profile)
             }
         }
-        profiles.addAll(fetchedProfiles)
     }
 
     fun reset() {
+        println("RESET")
         mode = Bedwars.NONE
         profiles.clear()
     }

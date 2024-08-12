@@ -1,7 +1,8 @@
 <div align="center">
 <h1>Bedwars Overlay Mod</h1>
-<h3> Flamey's bedwars overlay for Jartex network </h3>
 </div>
+
+<h2> Flamey's bedwars overlay for Jartex network </h2>
 
 ## Settings
 
@@ -11,9 +12,9 @@ use `/overlay reset` to reset the overlay
 
 ## Supported Servers
 
-Jartex Network \
-Pika Network *[SOON]* \
-BlocksMC *[SOON]* 
+Jartex Network ✅ \
+Pika Network _SOON_ \
+BlocksMC _SOON_
 
 ## Configurations
 all the config files are saved in `.minecraft/config/overlay.bruh`
