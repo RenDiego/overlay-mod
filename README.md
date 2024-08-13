@@ -12,7 +12,7 @@ use `/overlay reload` to reload the overlay if something went wrong
 ### Supported Servers
 
 Jartex Network ✅ \
-Pika Network **[SOON]** \
+Pika Network ✅ \
 BlocksMC **[SOON]** 
 
 ### Configurations

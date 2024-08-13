@@ -2,9 +2,10 @@ package dev.flamey.overlay
 
 import dev.flamey.overlay.api.API
 import dev.flamey.overlay.api.player.Profile
-import dev.flamey.overlay.api.server.Bedwars
+import dev.flamey.overlay.api.server.SupportedServer
 import dev.flamey.overlay.utils.Utils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import java.awt.Color
@@ -18,8 +19,12 @@ object Overlay {
     var x = 10; var y = 10; var width = 200; var height = 20
     private val profiles = CopyOnWriteArrayList<Profile>()
     private val mc = Minecraft.getMinecraft()
+    private var gaming = false
+        set(value) {
+            if (value) reset()
+            field = value
+        }
     var offset = 0
-    private var mode = Bedwars.NONE
 
     fun draw() {
         Utils.drawRect(x, y, width, height, Color(0, 0, 0, 125))
@@ -75,91 +80,205 @@ object Overlay {
     fun chat(e: ClientChatReceivedEvent) {
 
         val msg = e.message.formattedText
-        val unformattedmsg = e.message.unformattedText
+        val realmsg = e.message.unformattedText
 
-        val joinPattern = Regex("BedWars ❖ (\\w+) has joined the game! \\(\\d+/\\d+\\)")
-        val leavePattern = Regex("BedWars ❖ (\\w+) has left the game! \\(\\d+/\\d+\\)")
+        val server: SupportedServer? = Main.server
 
-        when {
-            joinPattern.matches(unformattedmsg) -> {
-                val username = joinPattern.find(unformattedmsg)?.groupValues?.get(1).toString()
-                join(username)
-            }
-            leavePattern.matches(unformattedmsg) -> {
-                val username = leavePattern.find(unformattedmsg)?.groupValues?.get(1).toString()
-                leave(username)
-            }
-            msg.equals("§r                 §r§f§m---§r §r§6§lThe game has started! §r§f§m---§r") -> {
-                println("START")
-                thread(start = true) {
-                    Thread.sleep(1500)
-                    val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
-                    players.forEach { p ->
-                        profiles.find { it.username == p.gameProfile.name }?.let { profile ->
-                            println("player found ${profile.username}")
-                            profile.displayName = ScorePlayerTeam.formatPlayerName(p.playerTeam, p.gameProfile.name)
+        val joinPattern = when (server) {
+            SupportedServer.PIKA -> Regex("BedWars ► (\\w+) has joined! \\(\\d+/\\d+\\)")
+            SupportedServer.JARTEX -> Regex("BedWars ❖ (\\w+) has joined the game! \\(\\d+/\\d+\\)")
+            SupportedServer.NONE -> Regex("")
+            null -> Regex("")
+        }
+
+        val leavePattern = when (server) {
+            SupportedServer.PIKA -> Regex("BedWars ► (\\w+) has quit! \\(\\d+/\\d+\\)")
+            SupportedServer.JARTEX -> Regex("BedWars ❖ (\\w+) has left the game! \\(\\d+/\\d+\\)")
+            SupportedServer.NONE -> Regex("")
+            null -> Regex("")
+        }
+
+        when (server) {
+            SupportedServer.PIKA -> {
+                when {
+                    // Username has joined!
+                    joinPattern.matches(realmsg) -> {
+                        val username = joinPattern.find(realmsg)?.groupValues?.get(1)
+                        if (username != mc.thePlayer.name) {
+                            username?.let { join(it) }
+                            gaming = false
+                        } else {
+                            gaming = true
                         }
                     }
-                    profiles.sortByDescending { it.displayName }
+                    leavePattern.matches(realmsg) -> {
+                        val username = joinPattern.find(realmsg)?.groupValues?.get(1)
+                        username?.let { leave(it) }
+                        gaming = false
+                    }
+                    msg.equals("§r                  §r§e§nGoodluck with your BedWars Game§r") -> {
+                        thread(start = true) {
+                            Thread.sleep(1500)
+                            val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
+                            sortByTeam(players, this.profiles)
+                        }
+                    }
+                    else -> {
+                        gaming = false
+                    }
                 }
             }
+            SupportedServer.JARTEX -> {
+                when {
+                    // Username has joined!
+                    joinPattern.matches(realmsg) -> {
+                        val username = joinPattern.find(realmsg)?.groupValues?.get(1)
+                        if (username != mc.thePlayer.name) {
+                            username?.let { join(it) }
+                        } else {
+                            gaming = true
+                        }
+                    }
+                    leavePattern.matches(realmsg) -> {
+                        val username = joinPattern.find(realmsg)?.groupValues?.get(1)
+                        username?.let { leave(it) }
+                    }
+                    msg.equals("§r                 §r§f§m---§r §r§6§lThe game has started! §r§f§m---§r") -> {
+                        println("START")
+                        thread(start = true) {
+                            Thread.sleep(1500)
+                            val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
+                            sortByTeam(players, this.profiles)
+                        }
+                    }
+                    else -> {
+                        gaming = false
+                    }
+                }
+            }
+            SupportedServer.NONE -> {
+
+            }
+            null -> {
+
+            }
         }
 
-        when {
-            msg.contains("§r§6§nBW1-") -> {
-                reset()
-                mode =
-                    Bedwars.SOLO
-            }
+//        when (Main.server) {
+//            SupportedServer.PIKA -> {
+//                val joinPattern = Regex("BedWars ► (\\w+) has joined! \\(\\d+/\\d+\\)")
+//                val leavePattern = Regex("BedWars ► (\\w+) has quit! \\(\\d+/\\d+\\)")
+//                when {
+//                    joinPattern.matches(unformattedmsg) -> {
+//                        val username = joinPattern.find(unformattedmsg)?.groupValues?.get(1)
+//                        if (username != null && username != mc.thePlayer.name) join(username) else if (username != mc.thePlayer.name) {
+//                            gaming = true
+//                            return
+//                        }
+//                        println("$username has joined")
+//                    }
+//                    leavePattern.matches(unformattedmsg) -> {
+//                        val username = leavePattern.find(unformattedmsg)?.groupValues?.get(1)
+//                        if (username != null) {
+//                            leave(username)
+//                            println("$username has left")
+//                        }
+//                    }
+//                    msg.equals("§r                  §r§e§nGoodluck with your BedWars Game§r") -> {
+//                        thread(start = true) {
+//                            Thread.sleep(1500)
+//                            val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
+//                            sortByTeam(players, this.profiles)
+//                        }
+//                    }
+//                    else -> {
+//                        gaming = false
+//                        return
+//                    }
+//                }
+//            }
+//            SupportedServer.JARTEX -> {
+//                val joinPattern = Regex("BedWars ❖ (\\w+) has joined the game! \\(\\d+/\\d+\\)")
+//                val leavePattern = Regex("BedWars ❖ (\\w+) has left the game! \\(\\d+/\\d+\\)")
+//                when {
+//                    joinPattern.matches(unformattedmsg) -> {
+//                        val username = joinPattern.find(unformattedmsg)?.groupValues?.get(1)
+//                        if (username != null && username != mc.thePlayer.name) join(username) else if (username != mc.thePlayer.name) {
+//                            gaming = true
+//                            return
+//                        }
+//                        println("$username has joined")
+//                    }
+//                    leavePattern.matches(unformattedmsg) -> {
+//                        val username = leavePattern.find(unformattedmsg)?.groupValues?.get(1)
+//                        if (username != null) {
+//                            leave(username)
+//                            println("$username has left")
+//                        }
+//                    }
+//                    msg.equals("§r                 §r§f§m---§r §r§6§lThe game has started! §r§f§m---§r") -> {
+//                        println("START")
+//                        thread(start = true) {
+//                            Thread.sleep(1500)
+//                            val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
+//                            sortByTeam(players, this.profiles)
+//                        }
+//                    }
+//                    else -> {
+//                        gaming = false
+//                        return
+//                    }
+//                }
+//            }
+//
+//            SupportedServer.NONE -> {
+//                return
+//            }
+//        }
 
-            msg.contains("§r§6§nBW2-") -> {
-                reset()
-                mode = Bedwars.DOUBLES
-            }
 
-            msg.contains("§r§6§nBW4-") -> {
-                reset()
-                mode = Bedwars.QUAD
-            }
-
-            else -> return
-        }
-
-        if (mode != Bedwars.NONE) {
+        if (gaming) {
             thread(start = true) {
                 fetch()
             }
+            gaming = false
         }
 
     }
 
     private fun leave(username: String) {
-        println("player $username has left")
         profiles.removeIf { it.username == username }
     }
 
     private fun join(username: String) {
-        println("player $username has joined")
-        profiles.sortBy { it.username }
-        if (!(profiles.any { it.username == username }) && username != mc.thePlayer.name) {
+        println("requesting from join $username")
+        if (!(profiles.any { it.username == username })) {
             thread(start = true) {
-                val profile = API.getProfile(username, mode)
+                val profile = API.getProfile(username)
                 profiles.add(profile)
             }
         }
     }
 
+    private fun sortByTeam(players: List<NetworkPlayerInfo>, profiles: CopyOnWriteArrayList<Profile>) {
+        players.forEach { p ->
+            profiles.find { it.username == p.gameProfile.name }?.let { profile ->
+                profile.displayName = ScorePlayerTeam.formatPlayerName(p.playerTeam, p.gameProfile.name)
+            }
+        }
+        profiles.sortByDescending { it.displayName }
+    }
+
     private fun fetch() {
         val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
         for (player in players) {
-            val profile = API.getProfile(player.gameProfile.name, mode)
+            val profile = API.getProfile(player.gameProfile.name)
+            println("requesting from fetch ${player.gameProfile.name}")
             profiles.addIfAbsent(profile)
         }
-        profiles.sortByDescending { it.fkdr }
     }
 
     fun reset() {
-        mode = Bedwars.NONE
         profiles.clear()
     }
 
@@ -194,7 +313,7 @@ object Overlay {
             in 55..60 -> "§3"
             in 65..75 -> "§l§e"
             in 75..100 -> "§l§6"
-            else -> "§k"
+            else -> "§l§7"
         }
     }
 

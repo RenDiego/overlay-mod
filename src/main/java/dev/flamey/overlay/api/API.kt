@@ -3,7 +3,6 @@ package dev.flamey.overlay.api
 import dev.flamey.overlay.Main
 import dev.flamey.overlay.api.player.Profile
 import dev.flamey.overlay.api.player.Rank
-import dev.flamey.overlay.api.server.Bedwars
 import dev.flamey.overlay.api.server.SupportedServer
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -21,12 +20,10 @@ object API {
         HttpURLConnection.setFollowRedirects(true)
     }
 
-    fun getProfile(username: String, bedwars: Bedwars = Bedwars.NONE, server: SupportedServer = Main.server) : Profile {
+    fun getProfile(username: String, server: SupportedServer = Main.server) : Profile {
         fetchedProfiles.find { it.username == username }?.let {
             return it
         }
-
-        println("requesting for $username")
 
         val url = URL("${getURL(server)}/profile/$username")
         val connection = url.openConnection() as HttpURLConnection
@@ -34,7 +31,7 @@ object API {
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0")
         connection.connect()
 
-        if (connection.responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+        if (connection.responseCode != HttpURLConnection.HTTP_OK) {
             val profile = Profile(
                 username,
                 rank = Rank(0, 0, 0, ""),
@@ -62,29 +59,25 @@ object API {
                 rank.getString("rankDisplay")
             ),
             nicked = false,
-            fkdr = getFKDR(username, bedwars)
+            fkdr = getFKDR(username)
         )
         fetchedProfiles.add(profile)
         return profile
 
     }
 
-    fun getFKDR(username: String, mode: Bedwars, server: SupportedServer = Main.server) : Double {
-        if (mode == Bedwars.NONE) return 0.0
-
+    fun getFKDR(username: String, server: SupportedServer = Main.server) : Double {
         fetchedProfiles.find { it.username == username }?.let {
             return it.fkdr
         }
 
-        println("requesting for $username")
-
-        val url = URL("${getURL(server)}/profile/$username/leaderboard?type=bedwars&interval=total&mode=$mode")
+        val url = URL("${getURL(server)}/profile/$username/leaderboard?type=bedwars&interval=total&mode=ALL_MODES")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0")
         connection.connect()
 
-        if (connection.responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+        if (connection.responseCode != HttpURLConnection.HTTP_OK) {
             return 0.0
         }
 

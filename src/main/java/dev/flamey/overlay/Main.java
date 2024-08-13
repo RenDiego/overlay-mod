@@ -5,10 +5,12 @@ import dev.flamey.overlay.command.CommandClass;
 import dev.flamey.overlay.command.gui.CommandGUI;
 import dev.flamey.overlay.config.ConfigManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -51,7 +53,7 @@ public class Main {
     @SubscribeEvent
     public void onRender(RenderGameOverlayEvent e) {
         if (e.type.equals(RenderGameOverlayEvent.ElementType.TEXT)) {
-            if (toggled) Overlay.INSTANCE.draw();
+            if (toggled && mc.currentScreen == null && !(mc.gameSettings.showDebugInfo)) Overlay.INSTANCE.draw();
         }
     }
 
@@ -74,7 +76,7 @@ public class Main {
 
     @SubscribeEvent
     public void chat(ClientChatReceivedEvent e) {
-        Overlay.INSTANCE.chat(e);
+        if (server != SupportedServer.NONE) Overlay.INSTANCE.chat(e);
     }
 
     @SubscribeEvent

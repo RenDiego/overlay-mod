@@ -108,7 +108,11 @@ class SearchGUI : GuiScreen() {
             searchButton.isMouseOver -> {
                 val username = textField.text
                 if (username.isEmpty() || server == SupportedServer.NONE) return
-                this.profile = API.getProfile(username = username, server = server)
+                try {
+                    API.getProfile(username = username, server = this.server).also { this.profile = it }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
                 textField.text = ""
                 textField.setFocused(false)
             }
