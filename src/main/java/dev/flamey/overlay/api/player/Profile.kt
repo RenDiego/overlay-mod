@@ -11,6 +11,7 @@ data class Profile(
     val clanName: String? = "None",
     val discordBoosting: Boolean = false,
     val nicked: Boolean,
+    val bedrock: Boolean = false,
     val fkdr: Double = 0.0,
 )
 

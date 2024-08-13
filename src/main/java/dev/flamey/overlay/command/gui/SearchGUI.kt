@@ -134,7 +134,7 @@ class SearchGUI : GuiScreen() {
         val json = JSONObject(connectionResult)
 
         val profile = API.getProfile(json, false, server)
-        results.add("${profile.rank.rankDisplay.replace("&", "§") + profile.username}§r | ${Overlay.getLevelColor(profile.rank.level) + profile.rank.level + "§r " + profile.rank.percentage}%")
+        results.add("${profile.rank.rankDisplay.replace("&", "§") + profile.username}§r | [${Overlay.getLevelColor(profile.rank.level) + profile.rank.level + "§r] " + profile.rank.percentage}%")
         results.add("§eFKDR: §r${Overlay.getFKDRColor(profile.fkdr) + (profile.fkdr)}")
         results.add("§eClan Name: §r${profile.clanName ?: "None"}")
         results.add("§eLast Seen: §r${Date(profile.lastSeen)}")

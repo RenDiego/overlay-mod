@@ -17,7 +17,10 @@ import kotlin.concurrent.thread
 
 object Overlay {
 
-    var x = 10; var y = 10; var width = 200; var height = 20
+    var x = 10
+    var y = 10
+    var width = 200
+    var height = 20
     private val profiles = CopyOnWriteArrayList<Profile>()
     private val mc = Minecraft.getMinecraft()
     var gaming = false
@@ -61,8 +64,10 @@ object Overlay {
         mc.fontRendererObj.drawStringWithShadow(
             if (profile.nicked) {
                 "§e[NICK]§r ${rankDisplay + profile.displayName}"
+            } else if (profile.bedrock) {
+                "§e[BEDROCK]§r ${rankDisplay + profile.displayName}"
             } else {
-                "§8[${getLevelColor(level) + level}§8]§r ${rankDisplay + profile.displayName}"
+                "§7[${getLevelColor(level) + level}§7]§r ${profile.displayName}"
             },
             x + 7f,
             y + 7f,
@@ -86,15 +91,15 @@ object Overlay {
         val server: SupportedServer? = Main.server
 
         val joinPattern = when (server) {
-            SupportedServer.PIKA -> Regex("BedWars ► (\\w+) has joined! \\(\\d+/\\d+\\)")
-            SupportedServer.JARTEX -> Regex("BedWars ❖ (\\w+) has joined the game! \\(\\d+/\\d+\\)")
+            SupportedServer.PIKA -> Regex("BedWars ► ([\\w.]+) has joined! \\(\\d+/\\d+\\)")
+            SupportedServer.JARTEX -> Regex("BedWars ❖ ([\\w.]+) has joined the game! \\(\\d+/\\d+\\)")
             SupportedServer.NONE -> Regex("")
             null -> Regex("")
         }
 
         val leavePattern = when (server) {
-            SupportedServer.PIKA -> Regex("BedWars ► (\\w+) has quit! \\(\\d+/\\d+\\)")
-            SupportedServer.JARTEX -> Regex("BedWars ❖ (\\w+) has left the game! \\(\\d+/\\d+\\)")
+            SupportedServer.PIKA -> Regex("BedWars ► ([\\w.]+) has quit! \\(\\d+/\\d+\\)")
+            SupportedServer.JARTEX -> Regex("BedWars ❖ ([\\w.]+) has left the game! \\(\\d+/\\d+\\)")
             SupportedServer.NONE -> Regex("")
             null -> Regex("")
         }
@@ -112,11 +117,14 @@ object Overlay {
                             gaming = true
                         }
                     }
+
                     leavePattern.matches(realmsg) -> {
-                        val username = joinPattern.find(realmsg)?.groupValues?.get(1)
+                        val username = leavePattern.find(realmsg)?.groupValues?.get(1)
+                        println(username)
                         username?.let { leave(it) }
                         gaming = false
                     }
+
                     msg.equals("§r                  §r§e§nGoodluck with your BedWars Game§r") -> {
                         thread(start = true) {
                             Thread.sleep(1500)
@@ -124,11 +132,13 @@ object Overlay {
                             sortByTeam(players)
                         }
                     }
+
                     else -> {
                         gaming = false
                     }
                 }
             }
+
             SupportedServer.JARTEX -> {
                 when {
                     // Username has joined!
@@ -140,10 +150,12 @@ object Overlay {
                             gaming = true
                         }
                     }
+
                     leavePattern.matches(realmsg) -> {
-                        val username = joinPattern.find(realmsg)?.groupValues?.get(1)
+                        val username = leavePattern.find(realmsg)?.groupValues?.get(1)
                         username?.let { leave(it) }
                     }
+
                     msg.equals("§r                 §r§f§m---§r §r§6§lThe game has started! §r§f§m---§r") -> {
                         println("START")
                         thread(start = true) {
@@ -152,14 +164,17 @@ object Overlay {
                             sortByTeam(players)
                         }
                     }
+
                     else -> {
                         gaming = false
                     }
                 }
             }
+
             SupportedServer.NONE -> {
 
             }
+
             null -> {
 
             }
@@ -193,18 +208,26 @@ object Overlay {
                 profile.displayName = ScorePlayerTeam.formatPlayerName(p.playerTeam, p.gameProfile.name)
             }
         }
+        val playerUsernames = players.map { it.gameProfile.name }.toSet()
+        profiles.removeIf { it.username !in playerUsernames }
         profiles.sortByDescending { it.displayName }
     }
 
-    private fun fetch(): CopyOnWriteArrayList<Profile> {
+    private fun fetch() {
         val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
         for (player in players) {
             val profile = API.getProfile(player.gameProfile.name)
-            if (profile.nicked)
-                Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("[Overlay] ${profile.username} is nicked!"))
+            when {
+                profile.nicked -> {
+                    Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("[Overlay] ${profile.username} is nicked!"))
+                }
+
+                profile.bedrock -> {
+                    Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("[Overlay] WARNING: ${profile.username} is using Bedrock, theres a highly chance of them cheating."))
+                }
+            }
             profiles.addIfAbsent(profile)
         }
-        return profiles
     }
 
     fun reset() {
@@ -215,10 +238,10 @@ object Overlay {
         profiles.clear()
         gaming = true
         thread(start = true) { fetch() }
-        sortByTeam( ArrayList(mc.thePlayer.sendQueue.playerInfoMap) )
+        sortByTeam(ArrayList(mc.thePlayer.sendQueue.playerInfoMap))
     }
 
-    fun getFKDRColor(fkdr: Double) : String {
+    fun getFKDRColor(fkdr: Double): String {
         return when (fkdr) {
             in 0.0..1.0 -> "§2"
             in 1.0..5.0 -> "§a"
@@ -226,7 +249,7 @@ object Overlay {
         }
     }
 
-    fun getLevelColor(level: Int) : String {
+    fun getLevelColor(level: Int): String {
         return when (level) {
             in 1..5 -> "§7"
             in 5..10 -> "§f"
