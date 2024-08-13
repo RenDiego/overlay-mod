@@ -164,86 +164,12 @@ object Overlay {
             }
         }
 
-//        when (Main.server) {
-//            SupportedServer.PIKA -> {
-//                val joinPattern = Regex("BedWars ► (\\w+) has joined! \\(\\d+/\\d+\\)")
-//                val leavePattern = Regex("BedWars ► (\\w+) has quit! \\(\\d+/\\d+\\)")
-//                when {
-//                    joinPattern.matches(unformattedmsg) -> {
-//                        val username = joinPattern.find(unformattedmsg)?.groupValues?.get(1)
-//                        if (username != null && username != mc.thePlayer.name) join(username) else if (username != mc.thePlayer.name) {
-//                            gaming = true
-//                            return
-//                        }
-//                        println("$username has joined")
-//                    }
-//                    leavePattern.matches(unformattedmsg) -> {
-//                        val username = leavePattern.find(unformattedmsg)?.groupValues?.get(1)
-//                        if (username != null) {
-//                            leave(username)
-//                            println("$username has left")
-//                        }
-//                    }
-//                    msg.equals("§r                  §r§e§nGoodluck with your BedWars Game§r") -> {
-//                        thread(start = true) {
-//                            Thread.sleep(1500)
-//                            val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
-//                            sortByTeam(players, this.profiles)
-//                        }
-//                    }
-//                    else -> {
-//                        gaming = false
-//                        return
-//                    }
-//                }
-//            }
-//            SupportedServer.JARTEX -> {
-//                val joinPattern = Regex("BedWars ❖ (\\w+) has joined the game! \\(\\d+/\\d+\\)")
-//                val leavePattern = Regex("BedWars ❖ (\\w+) has left the game! \\(\\d+/\\d+\\)")
-//                when {
-//                    joinPattern.matches(unformattedmsg) -> {
-//                        val username = joinPattern.find(unformattedmsg)?.groupValues?.get(1)
-//                        if (username != null && username != mc.thePlayer.name) join(username) else if (username != mc.thePlayer.name) {
-//                            gaming = true
-//                            return
-//                        }
-//                        println("$username has joined")
-//                    }
-//                    leavePattern.matches(unformattedmsg) -> {
-//                        val username = leavePattern.find(unformattedmsg)?.groupValues?.get(1)
-//                        if (username != null) {
-//                            leave(username)
-//                            println("$username has left")
-//                        }
-//                    }
-//                    msg.equals("§r                 §r§f§m---§r §r§6§lThe game has started! §r§f§m---§r") -> {
-//                        println("START")
-//                        thread(start = true) {
-//                            Thread.sleep(1500)
-//                            val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
-//                            sortByTeam(players, this.profiles)
-//                        }
-//                    }
-//                    else -> {
-//                        gaming = false
-//                        return
-//                    }
-//                }
-//            }
-//
-//            SupportedServer.NONE -> {
-//                return
-//            }
-//        }
-
-
         if (gaming) {
             thread(start = true) {
                 fetch()
             }
             gaming = false
         }
-
     }
 
     private fun leave(username: String) {
@@ -280,13 +206,6 @@ object Overlay {
 
     fun reset() {
         profiles.clear()
-    }
-
-    fun reload() {
-        profiles.clear()
-        thread(start = true) {
-            fetch()
-        }
     }
 
     private fun getFKDRColor(fkdr: Double) : String {

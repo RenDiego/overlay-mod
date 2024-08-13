@@ -61,14 +61,14 @@ object API {
                 rank.getString("rankDisplay")
             ),
             nicked = false,
-            fkdr = getFKDR(username)
+            fkdr = getFKDR(username, server)
         )
         fetchedProfiles.add(profile)
         return profile
 
     }
 
-    fun getFKDR(username: String, server: SupportedServer = Main.server) : Double {
+    private fun getFKDR(username: String, server: SupportedServer = Main.server) : Double {
         fetchedProfiles.find { it.username == username }?.let {
             return it.fkdr
         }
