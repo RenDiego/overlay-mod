@@ -21,8 +21,10 @@ object API {
     }
 
     fun getProfile(username: String, server: SupportedServer = Main.server, infetched: Boolean = true) : Profile {
-        fetchedProfiles.find { it.username == username }?.let {
-            return it
+        if (infetched) {
+            fetchedProfiles.find { it.username == username }?.let {
+                return it
+            }
         }
 
         val url = URL("${getURL(server)}/profile/$username")
