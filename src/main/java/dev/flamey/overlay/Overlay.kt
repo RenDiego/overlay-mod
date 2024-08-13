@@ -67,7 +67,7 @@ object Overlay {
             } else if (profile.bedrock) {
                 "§e[BEDROCK]§r ${rankDisplay + profile.displayName}"
             } else {
-                "§7[${getLevelColor(level) + level}§7]§r ${profile.displayName}"
+                "§7[${getLevelColor(level) + level}§7]§r ${rankDisplay + profile.displayName}"
             },
             x + 7f,
             y + 7f,
@@ -115,12 +115,12 @@ object Overlay {
                             gaming = false
                         } else {
                             gaming = true
+                            mc.thePlayer.addChatMessage(ChatComponentText("[overlay ] started gaming"))
                         }
                     }
 
                     leavePattern.matches(realmsg) -> {
                         val username = leavePattern.find(realmsg)?.groupValues?.get(1)
-                        println(username)
                         username?.let { leave(it) }
                         gaming = false
                     }
@@ -157,7 +157,6 @@ object Overlay {
                     }
 
                     msg.equals("§r                 §r§f§m---§r §r§6§lThe game has started! §r§f§m---§r") -> {
-                        println("START")
                         thread(start = true) {
                             Thread.sleep(1500)
                             val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
@@ -193,7 +192,6 @@ object Overlay {
     }
 
     private fun join(username: String) {
-        println("requesting from join $username")
         if (!(profiles.any { it.username == username })) {
             thread(start = true) {
                 val profile = API.getProfile(username)
