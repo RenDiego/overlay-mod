@@ -109,7 +109,7 @@ class SearchGUI : GuiScreen() {
                 val username = textField.text
                 if (username.isEmpty() || server == SupportedServer.NONE) return
                 try {
-                    API.getProfile(username = username, server = this.server).also { this.profile = it }
+                    API.getProfile(username = username, server = this.server, infetched = false).also { this.profile = it }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

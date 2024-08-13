@@ -14,13 +14,13 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 object API {
 
-    val fetchedProfiles = CopyOnWriteArrayList<Profile>()
+    private val fetchedProfiles = CopyOnWriteArrayList<Profile>()
 
     init {
         HttpURLConnection.setFollowRedirects(true)
     }
 
-    fun getProfile(username: String, server: SupportedServer = Main.server) : Profile {
+    fun getProfile(username: String, server: SupportedServer = Main.server, infetched: Boolean = true) : Profile {
         fetchedProfiles.find { it.username == username }?.let {
             return it
         }

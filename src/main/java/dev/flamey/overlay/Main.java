@@ -53,7 +53,7 @@ public class Main {
     @SubscribeEvent
     public void onRender(RenderGameOverlayEvent e) {
         if (e.type.equals(RenderGameOverlayEvent.ElementType.TEXT)) {
-            if (toggled && mc.currentScreen == null && !(mc.gameSettings.showDebugInfo)) Overlay.INSTANCE.draw();
+            if (toggled && !(mc.gameSettings.showDebugInfo)) Overlay.INSTANCE.draw();
         }
     }
 
