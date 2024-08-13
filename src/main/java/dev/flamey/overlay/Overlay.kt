@@ -7,6 +7,7 @@ import dev.flamey.overlay.utils.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.scoreboard.ScorePlayerTeam
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import java.awt.Color
 import java.math.BigDecimal
@@ -19,7 +20,7 @@ object Overlay {
     var x = 10; var y = 10; var width = 200; var height = 20
     private val profiles = CopyOnWriteArrayList<Profile>()
     private val mc = Minecraft.getMinecraft()
-    private var gaming = false
+    var gaming = false
         set(value) {
             if (value) reset()
             field = value
@@ -120,7 +121,7 @@ object Overlay {
                         thread(start = true) {
                             Thread.sleep(1500)
                             val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
-                            sortByTeam(players, this.profiles)
+                            sortByTeam(players)
                         }
                     }
                     else -> {
@@ -148,7 +149,7 @@ object Overlay {
                         thread(start = true) {
                             Thread.sleep(1500)
                             val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
-                            sortByTeam(players, this.profiles)
+                            sortByTeam(players)
                         }
                     }
                     else -> {
@@ -186,7 +187,7 @@ object Overlay {
         }
     }
 
-    private fun sortByTeam(players: List<NetworkPlayerInfo>, profiles: CopyOnWriteArrayList<Profile>) {
+    private fun sortByTeam(players: List<NetworkPlayerInfo>) {
         players.forEach { p ->
             profiles.find { it.username == p.gameProfile.name }?.let { profile ->
                 profile.displayName = ScorePlayerTeam.formatPlayerName(p.playerTeam, p.gameProfile.name)
@@ -195,17 +196,26 @@ object Overlay {
         profiles.sortByDescending { it.displayName }
     }
 
-    private fun fetch() {
+    private fun fetch(): CopyOnWriteArrayList<Profile> {
         val players = CopyOnWriteArrayList(mc.thePlayer.sendQueue.playerInfoMap)
         for (player in players) {
             val profile = API.getProfile(player.gameProfile.name)
-            println("requesting from fetch ${player.gameProfile.name}")
+            if (profile.nicked)
+                Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("[Overlay] ${profile.username} is nicked!"))
             profiles.addIfAbsent(profile)
         }
+        return profiles
     }
 
     fun reset() {
         profiles.clear()
+    }
+
+    fun reload() {
+        profiles.clear()
+        gaming = true
+        thread(start = true) { fetch() }
+        sortByTeam( ArrayList(mc.thePlayer.sendQueue.playerInfoMap) )
     }
 
     private fun getFKDRColor(fkdr: Double) : String {

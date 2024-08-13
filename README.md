@@ -3,6 +3,9 @@
 <p>Bedwars Statistics mod for Jartex Network</p>
 </div>
 
+## Screenshots
+![screenshot](/screenshot.png)
+
 ### Settings
 
 use the `/overlay` command for the GUI \

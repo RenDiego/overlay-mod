@@ -4,6 +4,8 @@ import dev.flamey.overlay.Main
 import dev.flamey.overlay.api.player.Profile
 import dev.flamey.overlay.api.player.Rank
 import dev.flamey.overlay.api.server.SupportedServer
+import net.minecraft.client.Minecraft
+import net.minecraft.util.ChatComponentText
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -33,7 +35,7 @@ object API {
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0")
         connection.connect()
 
-        if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+        if (connection.responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
             val profile = Profile(
                 username,
                 rank = Rank(0, 0, 0, ""),
@@ -42,6 +44,8 @@ object API {
             )
             fetchedProfiles.add(profile)
             return profile
+        } else if (connection.responseCode == 429) {
+            Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("[Overlay] got rate limited bruh"))
         }
 
         var result: String
