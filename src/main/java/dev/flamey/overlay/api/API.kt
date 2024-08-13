@@ -29,11 +29,7 @@ object API {
             }
         }
 
-        val url = URL("${getURL(server)}/profile/$username")
-        val connection = url.openConnection() as HttpURLConnection
-        connection.requestMethod = "GET"
-        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0")
-        connection.connect()
+        val connection = connect(username, server)
 
         if (connection.responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
             val profile = Profile(
@@ -48,7 +44,7 @@ object API {
             Minecraft.getMinecraft().thePlayer.addChatMessage(ChatComponentText("[Overlay] got rate limited bruh"))
         }
 
-        var result: String
+        val result: String
 
         BufferedReader(
             InputStreamReader(connection.inputStream)
@@ -72,7 +68,47 @@ object API {
 
     }
 
-    private fun getFKDR(username: String, server: SupportedServer = Main.server) : Double {
+    fun getProfile(json: JSONObject, infetched: Boolean, server: SupportedServer = Main.server) : Profile {
+        val username = json.getString("username")
+        if (infetched) {
+            fetchedProfiles.find { it.username == username }?.let {
+                return it
+            }
+        }
+
+        val rank = json.getJSONObject("rank")
+        val profile = Profile(
+            username,
+            rank = Rank(
+                rank.getInt("level"),
+                rank.getInt("experience"),
+                rank.getInt("percentage"),
+                rank.getString("rankDisplay")
+            ),
+            nicked = false,
+            fkdr = getFKDR(username, server),
+            clanName = json.optJSONObject("clan")?.getString("name"),
+            discordBoosting = json.getBoolean("discord_boosting"),
+            discordVerified = json.getBoolean("discord_verified"),
+            emailVerified = json.getBoolean("email_verified"),
+            lastSeen = json.getLong("lastSeen"),
+            friends = json.getJSONArray("friends").map { it as JSONObject; it.getString("username") }.toTypedArray()
+        )
+        fetchedProfiles.add(profile)
+        return profile
+    }
+
+    fun connect(username: String, server: SupportedServer = Main.server): HttpURLConnection {
+        val url = URL("${getURL(server)}/profile/$username")
+        val connection = url.openConnection() as HttpURLConnection
+        connection.requestMethod = "GET"
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0")
+        connection.connect()
+
+        return connection
+    }
+
+    private fun getFKDR(username: String, server: SupportedServer) : Double {
         fetchedProfiles.find { it.username == username }?.let {
             return it.fkdr
         }

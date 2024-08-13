@@ -22,7 +22,7 @@ public class Main {
 
     public Minecraft mc = Minecraft.getMinecraft();
 
-    public final static String VERSION = "0.0.1";
+    public final static String VERSION = "0.0.2";
     public final static String NAME = "overlay";
     public final static String MODID = "overlay";
 

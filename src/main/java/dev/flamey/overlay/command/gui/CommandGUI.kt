@@ -49,7 +49,7 @@ class CommandGUI : GuiScreen() {
 
         GL11.glScaled(2.0, 2.0, 2.0)
 
-        this.drawCenteredString(this.fontRendererObj, "bedwars overlay mod", (this.width / 2) / 2, ((this.height - fontRendererObj.FONT_HEIGHT) / 2) / 2 - 20, -1)
+        this.drawCenteredString(this.fontRendererObj, "overlay mod v${Main.VERSION}", (this.width / 2) / 2, ((this.height - fontRendererObj.FONT_HEIGHT) / 2) / 2 - 20, -1)
 
         GL11.glPopMatrix()
 

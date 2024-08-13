@@ -1,21 +1,25 @@
 package dev.flamey.overlay.command.gui
 
+import dev.flamey.overlay.Overlay
 import dev.flamey.overlay.api.API
-import dev.flamey.overlay.api.player.Profile
-import dev.flamey.overlay.api.player.Rank
 import dev.flamey.overlay.api.server.SupportedServer
 import dev.flamey.overlay.utils.Utils
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.GuiTextField
+import org.json.JSONObject
 import org.lwjgl.opengl.GL11
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.util.Date
 
 class SearchGUI : GuiScreen() {
 
     private lateinit var textField: GuiTextField
     private lateinit var searchButton: GuiButton
     private lateinit var server: SupportedServer
-    private lateinit var profile: Profile
+    private var results = ArrayList<String>()
 
     override fun initGui() {
         textField = GuiTextField(
@@ -37,12 +41,6 @@ class SearchGUI : GuiScreen() {
             "Search"
         )
         server = SupportedServer.NONE
-        profile = Profile(
-            username = "",
-            rank = Rank(0, 0, 0, ""),
-            nicked = false,
-            fkdr = 0.0
-        )
         super.initGui()
     }
 
@@ -71,26 +69,19 @@ class SearchGUI : GuiScreen() {
             -1
         )
 
+        var offset = 0
+        for (result in results) {
+            fontRendererObj.drawStringWithShadow(
+                result,
+                this.width / 2f - 80,
+                ((this.height - fontRendererObj.FONT_HEIGHT)) / 2 + 30f + offset,
+                -1
+            )
+            offset += fontRendererObj.FONT_HEIGHT
+        }
+
         textField.drawTextBox()
         searchButton.drawButton(mc, mouseX, mouseY)
-
-        if (!profile.nicked && profile.username != "") {
-            this.drawCenteredString(
-                fontRendererObj,
-                "${profile.rank.rankDisplay.replace("&", "§") + profile.username}§r | ${profile.rank.level} ${profile.rank.percentage}",
-                this.width / 2,
-                ((this.height - fontRendererObj.FONT_HEIGHT)) / 2 + 25,
-                -1
-            )
-        } else if (profile.username != "") {
-            this.drawCenteredString(
-                fontRendererObj,
-                "404 - not found.",
-                this.width / 2,
-                ((this.height - fontRendererObj.FONT_HEIGHT)) / 2 + 25,
-                -1
-            )
-        }
 
         super.drawScreen(mouseX, mouseY, partialTicks)
     }
@@ -106,15 +97,16 @@ class SearchGUI : GuiScreen() {
                 server = values[nextIndex]
             }
             searchButton.isMouseOver -> {
-                val username = textField.text
+                val username = textField.text.trim()
                 if (username.isEmpty() || server == SupportedServer.NONE) return
+
+                results.clear()
                 try {
-                    API.getProfile(username = username, server = this.server, infetched = false).also { this.profile = it }
+                    search(username)
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    results.add("Error: $e")
                 }
-                textField.text = ""
-                textField.setFocused(false)
             }
         }
 
@@ -124,6 +116,30 @@ class SearchGUI : GuiScreen() {
     override fun keyTyped(typedChar: Char, keyCode: Int) {
         textField.textboxKeyTyped(typedChar, keyCode)
         super.keyTyped(typedChar, keyCode)
+    }
+
+    private fun search(username: String) {
+        val connection = API.connect(username, server)
+
+        if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+            results.add("${connection.responseCode} - Not found.")
+            return
+        }
+
+        val connectionResult: String
+        BufferedReader(
+            InputStreamReader(connection.inputStream)
+        ).use { reader -> connectionResult = reader.readLine() }
+
+        val json = JSONObject(connectionResult)
+
+        val profile = API.getProfile(json, false, server)
+        results.add("${profile.rank.rankDisplay.replace("&", "§") + profile.username}§r | ${Overlay.getLevelColor(profile.rank.level) + profile.rank.level + "§r " + profile.rank.percentage}%")
+        results.add("§eFKDR: §r${Overlay.getFKDRColor(profile.fkdr) + (profile.fkdr)}")
+        results.add("§eClan Name: §r${profile.clanName ?: "None"}")
+        results.add("§eLast Seen: §r${Date(profile.lastSeen)}")
+        results.add("§eFriends: §r${if (profile.friends.isNotEmpty()) profile.friends.joinToString(", ") else "Lonely :("}")
+
     }
 
     override fun updateScreen() {

@@ -218,7 +218,7 @@ object Overlay {
         sortByTeam( ArrayList(mc.thePlayer.sendQueue.playerInfoMap) )
     }
 
-    private fun getFKDRColor(fkdr: Double) : String {
+    fun getFKDRColor(fkdr: Double) : String {
         return when (fkdr) {
             in 0.0..1.0 -> "§2"
             in 1.0..5.0 -> "§a"
@@ -226,7 +226,7 @@ object Overlay {
         }
     }
 
-    private fun getLevelColor(level: Int) : String {
+    fun getLevelColor(level: Int) : String {
         return when (level) {
             in 1..5 -> "§7"
             in 5..10 -> "§f"
