@@ -48,7 +48,7 @@ public class OverlayMod {
             configManager.load();
             checkVersion();
         } catch (IOException e) {
-            System.out.println("Failed to load config");
+            System.out.println("Failed to load overlay config");
             e.printStackTrace();
         }
     }
@@ -87,7 +87,6 @@ public class OverlayMod {
                 if (Keyboard.getEventKeyState()) {
                     int keyCode = Keyboard.getEventKey();
                     if (keyCode == key) {
-                        System.out.println("a");
                         Overlay.toggled = !Overlay.toggled;
                     }
                 }
@@ -99,7 +98,6 @@ public class OverlayMod {
 
     @SubscribeEvent
     public void onChat(ClientChatReceivedEvent e) {
-
         if (OverlayMod.INSTANCE.getServer() != Server.NONE) {
             Overlay.INSTANCE.onChat(e.message);
         }

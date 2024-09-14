@@ -21,4 +21,7 @@ public class Profile {
         this.fkdr = "§e..";
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
 }
