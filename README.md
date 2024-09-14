@@ -16,7 +16,14 @@ Download the latest version at the [releases](https://github.com/sigma-coder-294
 Use the `/overlay` command to open the gui
 - `KeyBind:` binds the overlay so you can turn it off/on with a key press
 - `Rainbow:` makes the text in the overlay look colorful
-- `Debug:` shows you extra information about the plays in your game
+- `Debug:` shows you extra information about the plays in your chat
+
+### Screenshots
+Overlay
+![overlay](/screenshots/overlay.png)
+
+Menu
+![gui](/screenshots/gui.png)
 
 ### Supported Servers
 - Jartex Network ✅
