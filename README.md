@@ -19,10 +19,11 @@ Use the `/overlay` command to open the gui
 - `Debug:` shows you extra information about the plays in your chat
 
 ### Screenshots
-Overlay
+##### Overlay
 ![overlay](/screenshots/overlay.png)
 
-Menu
+
+##### Menu
 ![gui](/screenshots/gui.png)
 
 ### Supported Servers
