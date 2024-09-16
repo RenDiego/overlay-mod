@@ -6,7 +6,6 @@ import com.github.WrongCoy.overlay.api.Profile;
 import com.github.WrongCoy.overlay.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
