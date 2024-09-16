@@ -18,6 +18,9 @@ Use the `/overlay` command to open the gui
 - `Rainbow:` makes the text in the overlay look colorful
 - `Debug:` shows you extra information about the plays in your chat
 
+> [!TIP]
+> use the `/overlay reload` command to reload the overlay if something goes wrong
+
 ### Screenshots
 ##### Overlay
 ![overlay](/screenshots/overlay.png)

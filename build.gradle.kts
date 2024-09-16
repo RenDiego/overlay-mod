@@ -83,7 +83,6 @@ tasks.jar {
 }
 
 tasks.shadowJar {
-//    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl)
 }
