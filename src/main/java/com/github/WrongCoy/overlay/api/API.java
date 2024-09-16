@@ -12,12 +12,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class API {
 
-    public static List<Profile> fetchedProfiles = new ArrayList<>();
+    public static List<Profile> fetchedProfiles = new CopyOnWriteArrayList<>();
 
     public static void getProfile(Profile profile) throws Exception {
         String username = profile.username.trim();

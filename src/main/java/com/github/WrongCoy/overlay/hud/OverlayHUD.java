@@ -6,10 +6,10 @@ import com.github.WrongCoy.overlay.api.Profile;
 import com.github.WrongCoy.overlay.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.*;
@@ -19,17 +19,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("all")
 public class OverlayHUD {
 
     public static OverlayHUD INSTANCE = new OverlayHUD();
     public final List<Profile> profiles = new CopyOnWriteArrayList<>();
-    public static int x = 10, y = 10, width = 180, height = 20;
+    public static int x = 10, y = 10, width = 135, height = 20;
     private final Minecraft mc = Minecraft.getMinecraft();
     public static boolean toggled;
+    private boolean fetching;
 
     int offset;
     public void draw() {
-        Utils.drawRect(x, y, width, height, new Color(0, 0, 0, 100).getRGB());
+        Utils.drawRect(x, y, width, height, new Color(0, 0, 0, OverlayMod.INSTANCE.getOpacity()).getRGB());
 
         if (OverlayMod.INSTANCE.isRainbow()) {
             Utils.drawRainbowString("ign", x + 7, y + 7, 5, 1, 1, 2000);
@@ -46,21 +48,23 @@ public class OverlayHUD {
             mc.fontRendererObj.drawStringWithShadow("wlr", x + width - (mc.fontRendererObj.getStringWidth("wlr") / 2f) - (35 / 2f), y + 7, -1);
             mc.fontRendererObj.drawStringWithShadow("kdr", x + width - (mc.fontRendererObj.getStringWidth("kdr") / 2f) - (35 / 2f) - 35, y + 7, -1);
         }
+
         offset = height;
 
         profiles.forEach(player -> {
-            drawRow(y + offset, player);
+            drawRow(x, y + offset, player);
             offset += height;
         });
     }
 
-    private void drawRow(int y, Profile player) {
+    private void drawRow(int x, int y, Profile player) {
+        int opacity = OverlayMod.INSTANCE.getOpacity();
         if (player.nicked || player.bedrock) {
-            Utils.drawRect(x, y, width, height, new Color(155, 0, 0, 100).getRGB());
+            Utils.drawRect(x, y, width, height, new Color(155, 0, 0, opacity).getRGB());
         } else if (player.statsOff) {
-            Utils.drawRect(x, y, width, height, new Color(155, 155, 155, 100).getRGB());
+            Utils.drawRect(x, y, width, height, new Color(155, 155, 155, opacity).getRGB());
         } else {
-            Utils.drawRect(x, y, width, height, new Color(0, 0, 0, 100).getRGB());
+            Utils.drawRect(x, y, width, height, new Color(0, 0, 0, opacity).getRGB());
         }
 
         String name = player.nicked ? String.format("§e[NICKED]§r %s", player.displayName) : String.format("§8[%s§8] §r%s", player.rank.level, player.rank.rankDisplay.replace("&", "§") + player.displayName);
@@ -74,6 +78,7 @@ public class OverlayHUD {
     }
 
     private void fetch() throws Exception {
+        fetching = true;
         final CopyOnWriteArrayList<NetworkPlayerInfo> players = new CopyOnWriteArrayList<>(mc.getNetHandler().getPlayerInfoMap());
         for (NetworkPlayerInfo player : players) {
             String name = player.getGameProfile().getName();
@@ -87,14 +92,17 @@ public class OverlayHUD {
                 Utils.warn(String.format("Player %s is NICKED!", profile.username));
             } else if (profile.bedrock) {
                 Utils.warn(String.format(EnumChatFormatting.DARK_RED + "Player %s is Hacking!!", profile.username));
+                Utils.debug(String.format("§d[%s] §c%s§r: §a%s §eFKD - §a%s §eWLR - §a%s §eKDR", profiles.indexOf(profile) + 1, profile.username, profile.fkdr, profile.wlr, profile.kdr));
             } else {
                 Utils.debug(String.format("§d[%s] §3%s§r: §a%s §eFKD - §a%s §eWLR - §a%s §eKDR", profiles.indexOf(profile) + 1, profile.username, profile.fkdr, profile.wlr, profile.kdr));
             }
             adjustWidth();
         }
+        fetching = false;
     }
 
     public void fetch(String username) throws Exception {
+        if (fetching) return;
         Profile profile = new Profile(username);
         profiles.add(profile);
         API.getProfile(profile);
@@ -106,10 +114,11 @@ public class OverlayHUD {
         } else if (profile.bedrock) {
             Utils.warn(String.format(EnumChatFormatting.DARK_RED + "Player %s is HACKING!!", username));
         }
-        Utils.debug(String.format("§d[%s] §3%s§r: §a%s §eFKD - §a%s §eWLR - §a%s §eKDR", profiles.indexOf(profile) + 1, profile.username, profile.fkdr, profile.wlr, profile.kdr));
+        Utils.debug(String.format("§3%s§r: §a%s §eFKD - §a%s §eWLR - §a%s §eKDR", profile.username, profile.fkdr, profile.wlr, profile.kdr));
     }
 
     public void reload() {
+        Utils.warn("Reloading...");
         profiles.clear();
         toggled = true;
         Runnable runnable = () -> {
@@ -144,13 +153,13 @@ public class OverlayHUD {
                 .max(Comparator.comparingInt(p -> p.nicked ? String.format("[NICKED] %s", p.username).length() : String.format("[%s] %s %s %s", p.rank.level, p.rank.rankDisplay, p.username, p.clan == null ? "" : p.clan.tag.isEmpty() ? p.clan.name : p.clan.tag).length()))
                 .orElse(null);
         if (p1 != null) {
-            String uhh = p1.nicked ? String.format("[NICKED] %s", p1.username) : String.format("[%s] %s %s", p1.rank.level, p1.rank.rankDisplay.replace("&", "§") + p1.username, p1.clan == null ? "" : p1.clan.tag.isEmpty() ? "[" + p1.clan.name + "]" : "[" + p1.clan.tag + "]");
-            int usernameLength = mc.fontRendererObj.getStringWidth(uhh);
-            width = 140 + usernameLength;
+            String uhh = p1.nicked ? String.format("[NICKED] %s", p1.username) : String.format("[%s] %s [%s]", p1.rank.level, p1.rank.rankDisplay.replace("&", "§") + p1.username, p1.clan == null ? "" : p1.clan.tag.isEmpty() ? "[" + p1.clan.name + "]" : "[" + p1.clan.tag + "]");
+            int usernameLength = mc.fontRendererObj.getStringWidth(uhh) - 20;
+            width = 135 + usernameLength;
         }
     }
 
-    public void onChat(@NotNull IChatComponent component) {
+    public void onChat(IChatComponent component) {
         String message = component.getUnformattedText();
 
         Pattern joinPattern = null, leavePattern = null;
@@ -190,17 +199,40 @@ public class OverlayHUD {
                     Utils.warn("Failed to fetch players: " + e.getMessage());
                     e.printStackTrace();
                 }
+                return;
             } else {
                 Runnable join = () -> onJoin(username);
                 Thread thread = new Thread(join);
                 thread.start();
+                return;
             }
         }
 
         if (leaveMatcher.find()) {
             String username = leaveMatcher.group(1);
-            System.out.println("Player leaving " + username);
             onLeave(username);
+            return;
+        }
+
+        if (message.equals(mc.thePlayer.getGameProfile().getName().trim() + " reconnected!")) {
+            try {
+                toggled = true;
+                Runnable fetchRunnable = () -> {
+                    try {
+                        Thread.sleep(500);
+                        fetch();
+                    } catch (Exception e) {
+                        Utils.warn("Failed to fetch players");
+                        e.printStackTrace();
+                    }
+                };
+                Thread thread = new Thread(fetchRunnable);
+                thread.start();
+                return;
+            } catch (Exception e) {
+                Utils.warn("Failed to fetch players: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
 
         if (component.getFormattedText().equals("§r                 §r§f§m---§r §r§6§lThe game has started! §r§f§m---§r") || component.getFormattedText().equals("§r                  §r§e§nGoodluck with your BedWars Game§r")) {
@@ -236,6 +268,5 @@ public class OverlayHUD {
     public boolean isMouseOver(int mouseX, int mouseY) {
         return mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + (height + offset);
     }
-
 
 }

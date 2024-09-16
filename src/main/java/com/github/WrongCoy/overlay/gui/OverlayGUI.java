@@ -6,21 +6,17 @@ import com.github.WrongCoy.overlay.utils.Utils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
-import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 
 public class OverlayGUI extends GuiScreen {
 
-    private GuiButton keyButton, rainbowButton, debugButton;
-    private boolean listening, dragging;
+    private boolean dragging;
     private int x2, y2;
 
     @Override
     public void initGui() {
-        keyButton = new GuiButton(1, width / 2 - 50, height / 2, 100, 20, getKeyBindButtonName());
-        rainbowButton = new GuiButton(2, width / 2 - 50, height / 2 + 22, 100, 20, String.format("Rainbow: %s", OverlayMod.INSTANCE.isRainbow()));
-        debugButton = new GuiButton(1, width / 2 - 50, height / 2 + 44, 100, 20, String.format("Debug: %s", OverlayMod.INSTANCE.isDebug()));
+        this.buttonList.add(new GuiButton(0, width / 2 - 50, height / 2, 100, 20, "Settings"));
         super.initGui();
     }
 
@@ -43,26 +39,13 @@ public class OverlayGUI extends GuiScreen {
             fontRendererObj.drawStringWithShadow("You can drag and move the Overlay", (width - fontRendererObj.getStringWidth("You can drag and move the Overlay")) / 2f, height / 2f - 15, -1);
         }
 
-        keyButton.drawButton(mc, mouseX, mouseY);
-        rainbowButton.drawButton(mc, mouseX, mouseY);
-        debugButton.drawButton(mc, mouseX, mouseY);
-
         OverlayHUD.INSTANCE.draw();
 
         if (dragging) {
             OverlayHUD.x = mouseX - x2;
             OverlayHUD.y = mouseY - y2;
         }
-
         super.drawScreen(mouseX, mouseY, partialTicks);
-    }
-
-    @Override
-    public void updateScreen() {
-        keyButton.displayString = getKeyBindButtonName();
-        rainbowButton.displayString = "Rainbow: " + OverlayMod.INSTANCE.isRainbow();
-        debugButton.displayString = "Debug: " + OverlayMod.INSTANCE.isDebug();
-        super.updateScreen();
     }
 
     @Override
@@ -73,14 +56,8 @@ public class OverlayGUI extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        if (keyButton.mousePressed(this.mc, mouseX, mouseY) && mouseButton == 0) {
-            listening = !listening;
-        }
-        if (rainbowButton.mousePressed(this.mc, mouseX, mouseY) && mouseButton == 0) {
-            OverlayMod.INSTANCE.setRainbow(!OverlayMod.INSTANCE.isRainbow());
-        }
-        if (debugButton.mousePressed(this.mc, mouseX, mouseY) && mouseButton == 0) {
-            OverlayMod.INSTANCE.setDebug(!OverlayMod.INSTANCE.isDebug());
+        if (this.buttonList.get(0).mousePressed(mc, mouseX, mouseY) && mouseButton == 0) {
+            mc.displayGuiScreen(new SettingsMenu());
         }
         if (OverlayHUD.INSTANCE.isMouseOver(mouseX, mouseY) && mouseButton == 0) {
             dragging = true;
@@ -89,24 +66,6 @@ public class OverlayGUI extends GuiScreen {
         }
 
         super.mouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    private String getKeyBindButtonName() {
-        return listening ? "Keybind: ..." : String.format("Keybind: %s", Keyboard.getKeyName(OverlayMod.key));
-    }
-
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (listening) {
-            if (keyCode != Keyboard.KEY_ESCAPE) {
-                OverlayMod.key = keyCode;
-            } else {
-                OverlayMod.key = Keyboard.KEY_NONE;
-                this.mc.displayGuiScreen(null);
-            }
-            listening = false;
-        }
-        super.keyTyped(typedChar, keyCode);
     }
 
     @Override

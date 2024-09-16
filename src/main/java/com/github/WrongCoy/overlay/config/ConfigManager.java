@@ -50,6 +50,9 @@ public class ConfigManager {
                 case "debug":
                     OverlayMod.INSTANCE.setDebug(Boolean.parseBoolean(keyValue[1].trim()));
                     break;
+                case "opacity":
+                    OverlayMod.INSTANCE.setOpacity(Integer.parseInt(keyValue[1].trim()));
+                    break;
             }
         }
     }
@@ -60,10 +63,15 @@ public class ConfigManager {
             boolean rainbow = OverlayMod.INSTANCE.isRainbow();
             boolean debug = OverlayMod.INSTANCE.isDebug();
             boolean toggled = OverlayHUD.toggled;
+            int opacity = OverlayMod.INSTANCE.getOpacity();
             int key = OverlayMod.key;
             int x = OverlayHUD.x;
             int y = OverlayHUD.y;
-            writer.write(String.format("keybind=%s x=%s y=%s toggled=%s rainbow=%s debug=%s", key, x, y, toggled, rainbow, debug));
+            writer.write(
+                    String.format(
+                            "keybind=%s x=%s y=%s toggled=%s rainbow=%s debug=%s opacity=%s", key, x, y, toggled, rainbow, debug, opacity
+                    )
+            );
             writer.flush();
             writer.close();
         } catch (IOException e) {

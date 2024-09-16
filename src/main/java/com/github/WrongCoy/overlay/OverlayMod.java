@@ -36,8 +36,9 @@ public class OverlayMod {
     public static boolean isOutdated, guiState = false;
     public static int key = Keyboard.KEY_NONE;
     private Server server = Server.NONE;
-    private boolean rainbow, debug;
     private ConfigManager configManager;
+    private boolean rainbow, debug;
+    private int opacity = 100;
 
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
@@ -148,5 +149,13 @@ public class OverlayMod {
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public int getOpacity() {
+        return opacity;
+    }
+
+    public void setOpacity(int opacity) {
+        this.opacity = opacity;
     }
 }
