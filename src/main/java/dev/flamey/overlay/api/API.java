@@ -2,8 +2,6 @@ package dev.flamey.overlay.api;
 
 import dev.flamey.overlay.OverlayMod;
 import dev.flamey.overlay.utils.Utils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.util.EnumChatFormatting;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,11 +12,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class API {
 
-    public static CopyOnWriteArrayList<Profile> fetchedProfiles = new CopyOnWriteArrayList<>();
+    public static List<Profile> fetchedProfiles = new ArrayList<>();
 
     public static void getProfile(Profile profile) throws Exception {
         String username = profile.username.trim();
@@ -40,18 +39,23 @@ public class API {
             System.out.println(OverlayMod.INSTANCE.getServer().getURL() + "/profile/" + username + " not found (Bad Request)");
         }
 
-        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK && connection.getResponseCode() != 429) {
-            Profile player = new Profile(profile.username);
-            player.nicked = true;
-            player.fkdr = "§7-";
-            player.wlr = "§7-";
-            player.kdr = "§7-";
-            fetchedProfiles.addIfAbsent(player);
+        if (connection.getResponseCode() == 404) {
+            profile.nicked = true;
+            profile.fkdr = "§7-";
+            profile.wlr = "§7-";
+            profile.kdr = "§7-";
+            fetchedProfiles.add(profile);
             return;
         } else if (connection.getResponseCode() == 429) {
             Thread.sleep(1500);
             connection = connect(OverlayMod.INSTANCE.getServer().getURL() + "/profile/" + username);
             Utils.warn("Rate limited waiting 1500ms");
+        } else if (connection.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT) {
+            profile.statsOff = true;
+            profile.fkdr = "§7-";
+            profile.wlr = "§7-";
+            profile.kdr = "§7-";
+            fetchedProfiles.add(profile);
         }
 
         String result = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
@@ -140,7 +144,7 @@ public class API {
             }
 
             if (deathsEntries == null && winsEntries == null && finalDeathsEntries == null && finalKillsEntries == null) {
-                Utils.warn(EnumChatFormatting.DARK_PURPLE + profile.username + " is a new account!");
+                Utils.warn(EnumChatFormatting.GREEN + profile.username + EnumChatFormatting.RESET + " is a new account!");
             }
 
         } catch (JSONException e) {

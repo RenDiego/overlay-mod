@@ -77,7 +77,7 @@ public class Overlay {
         final CopyOnWriteArrayList<NetworkPlayerInfo> players = new CopyOnWriteArrayList<>(mc.getNetHandler().getPlayerInfoMap());
         for (NetworkPlayerInfo player : players) {
             String name = player.getGameProfile().getName();
-            Profile profile = new Profile(name);
+            Profile profile = new Profile(name.trim());
             profiles.add(profile);
         }
         for (Profile profile : profiles) {
@@ -109,6 +109,23 @@ public class Overlay {
         Utils.debug(String.format("§d[%s] §3%s§r: §a%s §eFKD - §a%s §eWLR - §a%s §eKDR", profiles.indexOf(profile) + 1, profile.username, profile.fkdr, profile.wlr, profile.kdr));
     }
 
+    public void reload() {
+        profiles.clear();
+        toggled = true;
+        Runnable runnable = () -> {
+            try {
+                Thread.sleep(500);
+                fetch();
+                sort();
+            } catch (Exception e) {
+                Utils.warn("Failed to reload players");
+                e.printStackTrace();
+            }
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
     public void sort() {
         final CopyOnWriteArrayList<NetworkPlayerInfo> players = new CopyOnWriteArrayList<>(mc.getNetHandler().getPlayerInfoMap());
         for (NetworkPlayerInfo p : players) {
@@ -119,6 +136,7 @@ public class Overlay {
         }
         Set<String> names = players.stream().map(player -> player.getGameProfile().getName()).collect(Collectors.toSet());
         profiles.removeIf(player -> !names.contains(player.username));
+        profiles.sort(Comparator.comparing(Profile::getDisplayName));
     }
 
     public void adjustWidth() {
@@ -127,8 +145,8 @@ public class Overlay {
                 .orElse(null);
         if (p1 != null) {
             String uhh = p1.nicked ? String.format("[NICKED] %s", p1.username) : String.format("[%s] %s %s", p1.rank.level, p1.rank.rankDisplay.replace("&", "§") + p1.username, p1.clan == null ? "" : p1.clan.tag.isEmpty() ? "[" + p1.clan.name + "]" : "[" + p1.clan.tag + "]");
-            int usernameLength = mc.fontRendererObj.getStringWidth(uhh) / 2;
-            width = 180 + usernameLength;
+            int usernameLength = mc.fontRendererObj.getStringWidth(uhh);
+            width = 140 + usernameLength;
         }
     }
 

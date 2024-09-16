@@ -1,5 +1,6 @@
 package dev.flamey.overlay;
 
+import dev.flamey.overlay.api.API;
 import dev.flamey.overlay.api.Server;
 import dev.flamey.overlay.command.OverlayCommand;
 import dev.flamey.overlay.config.ConfigManager;
@@ -78,6 +79,13 @@ public class OverlayMod {
         } else {
             this.server = Server.NONE;
         }
+    }
+
+    @SubscribeEvent
+    public void onDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent e) {
+        Overlay.INSTANCE.profiles.clear();
+        API.fetchedProfiles.clear();
+        this.server = Server.NONE;
     }
 
     @SubscribeEvent
