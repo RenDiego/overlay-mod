@@ -1,4 +1,4 @@
-package dev.flamey.overlay.api;
+package com.github.WrongCoy.overlay.api;
 
 public class Clan {
 

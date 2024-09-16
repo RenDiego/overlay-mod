@@ -1,11 +1,11 @@
-package dev.flamey.overlay;
+package com.github.WrongCoy.overlay;
 
-import dev.flamey.overlay.api.API;
-import dev.flamey.overlay.api.Server;
-import dev.flamey.overlay.command.OverlayCommand;
-import dev.flamey.overlay.config.ConfigManager;
-import dev.flamey.overlay.gui.OverlayGUI;
-import dev.flamey.overlay.hud.Overlay;
+import com.github.WrongCoy.overlay.api.API;
+import com.github.WrongCoy.overlay.api.Server;
+import com.github.WrongCoy.overlay.command.OverlayCommand;
+import com.github.WrongCoy.overlay.config.ConfigManager;
+import com.github.WrongCoy.overlay.gui.OverlayGUI;
+import com.github.WrongCoy.overlay.hud.OverlayHUD;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -56,8 +56,8 @@ public class OverlayMod {
 
     @SubscribeEvent
     public void onRender(RenderGameOverlayEvent e) {
-        if (!e.type.equals(RenderGameOverlayEvent.ElementType.TEXT) || mc.currentScreen instanceof OverlayGUI || mc.gameSettings.showDebugInfo || !Overlay.toggled) return;
-        Overlay.INSTANCE.draw();
+        if (!e.type.equals(RenderGameOverlayEvent.ElementType.TEXT) || mc.currentScreen instanceof OverlayGUI || mc.gameSettings.showDebugInfo || !OverlayHUD.toggled) return;
+        OverlayHUD.INSTANCE.draw();
     }
 
     @SubscribeEvent
@@ -83,7 +83,7 @@ public class OverlayMod {
 
     @SubscribeEvent
     public void onDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent e) {
-        Overlay.INSTANCE.profiles.clear();
+        OverlayHUD.INSTANCE.profiles.clear();
         API.fetchedProfiles.clear();
         this.server = Server.NONE;
     }
@@ -95,7 +95,7 @@ public class OverlayMod {
                 if (Keyboard.getEventKeyState()) {
                     int keyCode = Keyboard.getEventKey();
                     if (keyCode == key) {
-                        Overlay.toggled = !Overlay.toggled;
+                        OverlayHUD.toggled = !OverlayHUD.toggled;
                     }
                 }
             }
@@ -107,7 +107,7 @@ public class OverlayMod {
     @SubscribeEvent
     public void onChat(ClientChatReceivedEvent e) {
         if (OverlayMod.INSTANCE.getServer() != Server.NONE) {
-            Overlay.INSTANCE.onChat(e.message);
+            OverlayHUD.INSTANCE.onChat(e.message);
         }
     }
 

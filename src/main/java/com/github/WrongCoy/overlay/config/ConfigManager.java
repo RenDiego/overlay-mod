@@ -1,8 +1,8 @@
-package dev.flamey.overlay.config;
+package com.github.WrongCoy.overlay.config;
 
-import dev.flamey.overlay.OverlayMod;
-import dev.flamey.overlay.hud.Overlay;
-import dev.flamey.overlay.utils.Utils;
+import com.github.WrongCoy.overlay.OverlayMod;
+import com.github.WrongCoy.overlay.hud.OverlayHUD;
+import com.github.WrongCoy.overlay.utils.Utils;
 
 import java.io.*;
 
@@ -36,13 +36,13 @@ public class ConfigManager {
                     OverlayMod.key = Integer.parseInt(keyValue[1]);
                     break;
                 case "x":
-                    Overlay.x = Integer.parseInt(keyValue[1].trim());
+                    OverlayHUD.x = Integer.parseInt(keyValue[1].trim());
                     break;
                 case "y":
-                    Overlay.y = Integer.parseInt(keyValue[1].trim());
+                    OverlayHUD.y = Integer.parseInt(keyValue[1].trim());
                     break;
                 case "toggled":
-                    Overlay.toggled = Boolean.parseBoolean(keyValue[1].trim());
+                    OverlayHUD.toggled = Boolean.parseBoolean(keyValue[1].trim());
                     break;
                 case "rainbow":
                     OverlayMod.INSTANCE.setRainbow(Boolean.parseBoolean(keyValue[1].trim()));
@@ -59,10 +59,10 @@ public class ConfigManager {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             boolean rainbow = OverlayMod.INSTANCE.isRainbow();
             boolean debug = OverlayMod.INSTANCE.isDebug();
-            boolean toggled = Overlay.toggled;
+            boolean toggled = OverlayHUD.toggled;
             int key = OverlayMod.key;
-            int x = Overlay.x;
-            int y = Overlay.y;
+            int x = OverlayHUD.x;
+            int y = OverlayHUD.y;
             writer.write(String.format("keybind=%s x=%s y=%s toggled=%s rainbow=%s debug=%s", key, x, y, toggled, rainbow, debug));
             writer.flush();
             writer.close();

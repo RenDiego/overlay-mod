@@ -1,7 +1,7 @@
-package dev.flamey.overlay.api;
+package com.github.WrongCoy.overlay.api;
 
-import dev.flamey.overlay.OverlayMod;
-import dev.flamey.overlay.utils.Utils;
+import com.github.WrongCoy.overlay.OverlayMod;
+import com.github.WrongCoy.overlay.utils.Utils;
 import net.minecraft.util.EnumChatFormatting;
 import org.json.JSONArray;
 import org.json.JSONException;

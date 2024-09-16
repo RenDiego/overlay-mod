@@ -1,9 +1,8 @@
-package dev.flamey.overlay.command;
+package com.github.WrongCoy.overlay.command;
 
-import dev.flamey.overlay.OverlayMod;
-import dev.flamey.overlay.hud.Overlay;
+import com.github.WrongCoy.overlay.OverlayMod;
+import com.github.WrongCoy.overlay.hud.OverlayHUD;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 
 public class OverlayCommand extends CommandBase {
@@ -22,7 +21,7 @@ public class OverlayCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         if (args != null && args.length > 0) {
             if (args[0].equalsIgnoreCase("reload")) {
-                Overlay.INSTANCE.reload();
+                OverlayHUD.INSTANCE.reload();
             }
         } else
             OverlayMod.guiState = true;

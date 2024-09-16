@@ -1,9 +1,9 @@
-package dev.flamey.overlay.hud;
+package com.github.WrongCoy.overlay.hud;
 
-import dev.flamey.overlay.OverlayMod;
-import dev.flamey.overlay.api.API;
-import dev.flamey.overlay.api.Profile;
-import dev.flamey.overlay.utils.Utils;
+import com.github.WrongCoy.overlay.OverlayMod;
+import com.github.WrongCoy.overlay.api.API;
+import com.github.WrongCoy.overlay.api.Profile;
+import com.github.WrongCoy.overlay.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.scoreboard.ScorePlayerTeam;
@@ -19,9 +19,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Overlay {
+public class OverlayHUD {
 
-    public static Overlay INSTANCE = new Overlay();
+    public static OverlayHUD INSTANCE = new OverlayHUD();
     public final List<Profile> profiles = new CopyOnWriteArrayList<>();
     public static int x = 10, y = 10, width = 180, height = 20;
     private final Minecraft mc = Minecraft.getMinecraft();

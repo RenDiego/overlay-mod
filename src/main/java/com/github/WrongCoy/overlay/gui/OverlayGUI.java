@@ -1,8 +1,8 @@
-package dev.flamey.overlay.gui;
+package com.github.WrongCoy.overlay.gui;
 
-import dev.flamey.overlay.OverlayMod;
-import dev.flamey.overlay.hud.Overlay;
-import dev.flamey.overlay.utils.Utils;
+import com.github.WrongCoy.overlay.OverlayMod;
+import com.github.WrongCoy.overlay.hud.OverlayHUD;
+import com.github.WrongCoy.overlay.utils.Utils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -47,11 +47,11 @@ public class OverlayGUI extends GuiScreen {
         rainbowButton.drawButton(mc, mouseX, mouseY);
         debugButton.drawButton(mc, mouseX, mouseY);
 
-        Overlay.INSTANCE.draw();
+        OverlayHUD.INSTANCE.draw();
 
         if (dragging) {
-            Overlay.x = mouseX - x2;
-            Overlay.y = mouseY - y2;
+            OverlayHUD.x = mouseX - x2;
+            OverlayHUD.y = mouseY - y2;
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -82,10 +82,10 @@ public class OverlayGUI extends GuiScreen {
         if (debugButton.mousePressed(this.mc, mouseX, mouseY) && mouseButton == 0) {
             OverlayMod.INSTANCE.setDebug(!OverlayMod.INSTANCE.isDebug());
         }
-        if (Overlay.INSTANCE.isMouseOver(mouseX, mouseY) && mouseButton == 0) {
+        if (OverlayHUD.INSTANCE.isMouseOver(mouseX, mouseY) && mouseButton == 0) {
             dragging = true;
-            x2 = mouseX - Overlay.x;
-            y2 = mouseY - Overlay.y;
+            x2 = mouseX - OverlayHUD.x;
+            y2 = mouseY - OverlayHUD.y;
         }
 
         super.mouseClicked(mouseX, mouseY, mouseButton);

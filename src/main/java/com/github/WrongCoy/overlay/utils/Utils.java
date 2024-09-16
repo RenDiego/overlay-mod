@@ -1,6 +1,6 @@
-package dev.flamey.overlay.utils;
+package com.github.WrongCoy.overlay.utils;
 
-import dev.flamey.overlay.OverlayMod;
+import com.github.WrongCoy.overlay.OverlayMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ChatComponentText;
