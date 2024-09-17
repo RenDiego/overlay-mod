@@ -10,8 +10,6 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.EnumChatFormatting;
 
-import java.util.Arrays;
-
 public class OverlayCommand extends CommandBase {
 
     @Override
