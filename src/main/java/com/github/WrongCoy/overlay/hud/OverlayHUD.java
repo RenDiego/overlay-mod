@@ -3,6 +3,7 @@ package com.github.WrongCoy.overlay.hud;
 import com.github.WrongCoy.overlay.OverlayMod;
 import com.github.WrongCoy.overlay.api.API;
 import com.github.WrongCoy.overlay.api.Profile;
+import com.github.WrongCoy.overlay.api.Server;
 import com.github.WrongCoy.overlay.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -11,6 +12,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 
 import java.awt.*;
+import java.rmi.ServerError;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -84,17 +86,16 @@ public class OverlayHUD {
             Profile profile = new Profile(name.trim());
             profiles.add(profile);
         }
+        Server server = OverlayMod.INSTANCE.getServer();
         for (Profile profile : profiles) {
-            API.getProfile(profile);
-            API.getInfo(profile);
+            API.getProfile(profile, server);
+            API.getInfo(profile, server);
             if (profile.nicked) {
-                Utils.warn(String.format("Player %s is NICKED!", profile.username));
+                Utils.print(String.format("Player %s is NICKED!", profile.username));
             } else if (profile.bedrock) {
-                Utils.warn(String.format(EnumChatFormatting.DARK_RED + "Player %s is Hacking!!", profile.username));
-                Utils.debug(String.format("§d[%s] §c%s§r: §a%s §eFKD - §a%s §eWLR - §a%s §eKDR", profiles.indexOf(profile) + 1, profile.username, profile.fkdr, profile.wlr, profile.kdr));
-            } else {
-                Utils.debug(String.format("§d[%s] §3%s§r: §a%s §eFKD - §a%s §eWLR - §a%s §eKDR", profiles.indexOf(profile) + 1, profile.username, profile.fkdr, profile.wlr, profile.kdr));
+                Utils.print(String.format(EnumChatFormatting.DARK_RED + "Player %s is Hacking!!", profile.username));
             }
+            Utils.debug(profile);
             adjustWidth();
         }
         fetching = false;
@@ -102,22 +103,23 @@ public class OverlayHUD {
 
     public void fetch(String username) throws Exception {
         if (fetching) return;
+        Server server = OverlayMod.INSTANCE.getServer();
         Profile profile = new Profile(username);
         profiles.add(profile);
-        API.getProfile(profile);
-        API.getInfo(profile);
+        API.getProfile(profile, server);
+        API.getInfo(profile, server);
         if (profile.nicked) {
-            Utils.warn("§e" + username + "§r is nicked!");
+            Utils.print("§e" + username + "§r is nicked!");
             profiles.add(profile);
             return;
         } else if (profile.bedrock) {
-            Utils.warn(String.format(EnumChatFormatting.DARK_RED + "Player %s is HACKING!!", username));
+            Utils.print(String.format(EnumChatFormatting.DARK_RED + "Player %s is HACKING!!", username));
         }
-        Utils.debug(String.format("§3%s§r: §a%s §eFKD - §a%s §eWLR - §a%s §eKDR", profile.username, profile.fkdr, profile.wlr, profile.kdr));
+        Utils.debug(profile);
     }
 
     public void reload() {
-        Utils.warn("Reloading...");
+        Utils.print("Reloading...");
         profiles.clear();
         toggled = true;
         Runnable runnable = () -> {
@@ -126,7 +128,7 @@ public class OverlayHUD {
                 fetch();
                 sort();
             } catch (Exception e) {
-                Utils.warn("Failed to reload players");
+                Utils.print("Failed to reload players");
                 e.printStackTrace();
             }
         };
@@ -188,14 +190,14 @@ public class OverlayHUD {
                             Thread.sleep(500);
                             fetch();
                         } catch (Exception e) {
-                            Utils.warn("Failed to fetch players");
+                            Utils.print("Failed to fetch players");
                             e.printStackTrace();
                         }
                     };
                     Thread thread = new Thread(fetchRunnable);
                     thread.start();
                 } catch (Exception e) {
-                    Utils.warn("Failed to fetch players: " + e.getMessage());
+                    Utils.print("Failed to fetch players: " + e.getMessage());
                     e.printStackTrace();
                 }
                 return;
@@ -221,7 +223,7 @@ public class OverlayHUD {
                         Thread.sleep(500);
                         fetch();
                     } catch (Exception e) {
-                        Utils.warn("Failed to fetch players");
+                        Utils.print("Failed to fetch players");
                         e.printStackTrace();
                     }
                 };
@@ -229,7 +231,7 @@ public class OverlayHUD {
                 thread.start();
                 return;
             } catch (Exception e) {
-                Utils.warn("Failed to fetch players: " + e.getMessage());
+                Utils.print("Failed to fetch players: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -253,7 +255,7 @@ public class OverlayHUD {
         try {
             fetch(username);
         } catch (Exception e) {
-            Utils.warn("Failed to fetch player: " + e.getMessage());
+            Utils.print("Failed to fetch player: " + e.getMessage());
             e.printStackTrace();
         }
         adjustWidth();

@@ -1,5 +1,6 @@
 > [!WARNING]
-> Overlay mods are not allowed on Jartex and Pika network, Use at your own risk
+> Overlay mods are not allowed on Jartex and Pika network, 
+> Use at your own risk
 
 <div align="center">
 <h1>Bedwars Overlay Mod</h1>
@@ -10,16 +11,18 @@
 ## Getting Started
 
 ### Installation
-Download the latest version at the [releases](https://github.com/sigma-coder-294/overlay-mod/releases) page and put it in the `.minecraft/mods` folder
+Download the latest version at the [releases](https://github.com/WrongCoy/overlay-mod/releases) page and put it in the `.minecraft/mods` folder
 
 ### Settings
 Use the `/overlay` command to open the gui
-- `KeyBind:` binds the overlay so you can turn it off/on with a key press
-- `Rainbow:` makes the text in the overlay look colorful
-- `Debug:` shows you extra information about the plays in your chat
+1. `KeyBind:` binds the overlay so you can turn it off/on with a key press
+2. `Rainbow:` makes the text in the overlay look colorful
+3. `Debug:` shows you extra information about the plays in your chat
 
-> [!TIP]
-> use the `/overlay reload` command to reload the overlay if something goes wrong
+### Commands
+- `/overlay` to open the Overlay gui
+- `/overlay reload` to reload the players if something went wrong
+- `/overlay get <player> <server>` get a player's info without them being in your game
 
 ### Screenshots
 ##### Overlay

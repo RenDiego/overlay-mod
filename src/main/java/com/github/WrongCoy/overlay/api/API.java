@@ -19,7 +19,7 @@ public class API {
 
     public static List<Profile> fetchedProfiles = new CopyOnWriteArrayList<>();
 
-    public static void getProfile(Profile profile) throws Exception {
+    public static void getProfile(Profile profile, Server server) throws Exception {
         String username = profile.username.trim();
         for (Profile player : fetchedProfiles) {
             if (player.username.equals(profile.username)) {
@@ -33,7 +33,7 @@ public class API {
             }
         }
 
-        HttpURLConnection connection = connect(OverlayMod.INSTANCE.getServer().getURL() + "/profile/" + username);
+        HttpURLConnection connection = connect(server.getURL() + "/profile/" + username);
 
         if (connection.getResponseCode() == 400) {
             System.out.println(OverlayMod.INSTANCE.getServer().getURL() + "/profile/" + username + " not found (Bad Request)");
@@ -49,7 +49,7 @@ public class API {
         } else if (connection.getResponseCode() == 429) {
             Thread.sleep(1500);
             connection = connect(OverlayMod.INSTANCE.getServer().getURL() + "/profile/" + username);
-            Utils.warn("Rate limited waiting 1500ms");
+            Utils.print("Rate limited waiting 1500ms");
         } else if (connection.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT) {
             profile.statsOff = true;
             profile.fkdr = "§7-";
@@ -69,7 +69,7 @@ public class API {
         fetchedProfiles.add(profile);
     }
 
-    public static void getInfo(Profile profile) throws IOException, InterruptedException {
+    public static void getInfo(Profile profile, Server server) throws IOException, InterruptedException {
 
         for (Profile player : fetchedProfiles) {
             if (player.username.equals(profile.username) && !player.fkdr.equals("§e..")) {
@@ -80,14 +80,14 @@ public class API {
             }
         }
 
-        HttpURLConnection connection = connect(OverlayMod.INSTANCE.getServer().getURL() + "/profile/" + profile.username + "/leaderboard?type=bedwars&interval=total&mode=ALL_MODES");
+        HttpURLConnection connection = connect(server.getURL() + "/profile/" + profile.username + "/leaderboard?type=bedwars&interval=total&mode=ALL_MODES");
 
         if (connection.getResponseCode() == 400) {
-            System.out.println(OverlayMod.INSTANCE.getServer().getURL() + "/profile/" + profile.username + " not found (Bad Request)");
+            System.out.println(server.getURL() + "/profile/" + profile.username + " not found (Bad Request)");
         }
 
         if (connection.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT) {
-            Utils.warn(profile.username + " has his stats off");
+            Utils.print(profile.username + " has his stats off");
             profile.statsOff = true;
             profile.fkdr = "§7-";
             profile.wlr = "§7-";
@@ -99,7 +99,7 @@ public class API {
         }
 
         if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            Utils.warn(connection.getResponseCode() + " Failed");
+            Utils.print(connection.getResponseCode() + " Failed");
             return;
         }
 
@@ -144,11 +144,11 @@ public class API {
             }
 
             if (deathsEntries == null && winsEntries == null && finalDeathsEntries == null && finalKillsEntries == null) {
-                Utils.warn(EnumChatFormatting.GREEN + profile.username + EnumChatFormatting.RESET + " is a new account!");
+                Utils.print(EnumChatFormatting.GREEN + profile.username + EnumChatFormatting.RESET + " is a new account!");
             }
 
         } catch (JSONException e) {
-            Utils.warn("Failed to get profile's info: " + profile.username);
+            Utils.print("Failed to get profile's info: " + profile.username);
             e.printStackTrace();
         }
 

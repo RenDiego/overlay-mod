@@ -1,6 +1,7 @@
 package com.github.WrongCoy.overlay.utils;
 
 import com.github.WrongCoy.overlay.OverlayMod;
+import com.github.WrongCoy.overlay.api.Profile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ChatComponentText;
@@ -36,7 +37,7 @@ public class Utils {
         Gui.drawRect(x, y, x + width, y + height, color);
     }
 
-    public static void warn(String message) {
+    public static void print(String message) {
         if (mc.thePlayer != null) {
             mc.thePlayer.playSound("random.orb", 1.0F, 1.0F);
             mc.thePlayer.addChatMessage(new ChatComponentText("§f[§dOverlay§f]§r " + message));
@@ -46,6 +47,12 @@ public class Utils {
     public static void debug(String message) {
         if (mc.thePlayer != null && OverlayMod.INSTANCE.isDebug()) {
             mc.thePlayer.addChatMessage(new ChatComponentText("§f[§eDEBUG§f]§r " + message));
+        }
+    }
+
+    public static void debug(Profile profile) {
+        if (mc.thePlayer != null && OverlayMod.INSTANCE.isDebug() && !profile.nicked && !profile.statsOff) {
+            Utils.debug(String.format("§c%s§r: §a%s §eFKDR - §a%s §eWLR - §a%s §eKDR", profile.username, profile.fkdr, profile.wlr, profile.kdr));
         }
     }
 
